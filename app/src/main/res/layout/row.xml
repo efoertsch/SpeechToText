@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/list_single_line_height"
+    android:gravity="center_vertical"
+    android:paddingLeft="@dimen/list_single_line_side_margin"
+    android:paddingRight="@dimen/list_single_line_side_margin">
+
+    <TextView
+        android:id="@+id/audio_record_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/audio_record_play_image"
+        android:layout_alignParentStart="true"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:textSize="@dimen/text_size_large"
+        android:textStyle="bold"
+        tools:text="Patient xyz"/>
+
+    <ImageButton
+        android:id="@+id/audio_record_play_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:gravity="center_vertical"
+        android:background="?android:attr/selectableItemBackground"
+        android:src="@drawable/ic_play_circle_outline"/>
+</RelativeLayout>

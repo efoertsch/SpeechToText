@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context="com.fisincorporated.aviationweather.drawer.WeatherDrawerActivity">
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewmodel"
+            type="com.fisincorporated.speechtotext.AudioRecorderViewModel"/>
+    </data>
+
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.fisincorporated.speechtotext.AudioRecorderActivity">
+
+    <LinearLayout
+        android:id="@+id/activity_recorder_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <include layout="@layout/simple_toolbar"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/activity_recorder_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    </LinearLayout>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:millisecId="@+millisecId/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@android:drawable/ic_dialog_email"/>
+
+</android.support.design.widget.CoordinatorLayout>
