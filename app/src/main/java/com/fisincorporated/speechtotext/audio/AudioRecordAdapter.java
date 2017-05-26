@@ -1,4 +1,4 @@
-package com.fisincorporated.speechtotext;
+package com.fisincorporated.speechtotext.audio;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,20 +8,26 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.fisincorporated.speechtotext.R;
+import com.fisincorporated.speechtotext.dagger.custom.PerActivity;
+
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;
 
-
-public class AudioRecordRecyclerView extends RealmRecyclerViewAdapter<AudioRecord, AudioRecordRecyclerView.MyViewHolder> {
+@PerActivity
+public class AudioRecordAdapter extends RealmRecyclerViewAdapter<AudioRecord, AudioRecordAdapter.MyViewHolder> {
 
     private boolean inDeletionMode = false;
     private Set<String> AudioRecordsToDelete = new HashSet<>();
     private Context context;
 
-   public AudioRecordRecyclerView(Context context, OrderedRealmCollection<AudioRecord> data) {
+    @Inject
+    public AudioRecordAdapter(Context context, OrderedRealmCollection<AudioRecord> data) {
         super(context, data, true);
         setHasStableIds(true);
     }
@@ -41,7 +47,7 @@ public class AudioRecordRecyclerView extends RealmRecyclerViewAdapter<AudioRecor
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row, parent, false);
+                .inflate(R.layout.audio_record_row, parent, false);
         return new MyViewHolder(itemView);
     }
 

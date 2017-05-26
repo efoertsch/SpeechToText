@@ -1,4 +1,4 @@
-package com.fisincorporated.speechtotext;
+package com.fisincorporated.speechtotext.audio;
 
 
 import java.text.SimpleDateFormat;
@@ -14,7 +14,6 @@ public class AudioRecord extends RealmObject {
     private static final SimpleDateFormat recordDate = new SimpleDateFormat("yyyy-MM-dd:HH:mm", Locale.getDefault());
 
     @Index
-    @Required
     private long millisecId;
 
     @Required
@@ -24,6 +23,8 @@ public class AudioRecord extends RealmObject {
     private String audioFileName;
 
     private String description;
+
+    public AudioRecord(){}
 
     public AudioRecord(long millisecId, String audioFileName ){
         this.millisecId = millisecId;

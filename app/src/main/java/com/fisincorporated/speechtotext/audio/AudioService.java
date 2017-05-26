@@ -1,10 +1,13 @@
-package com.fisincorporated.speechtotext;
+package com.fisincorporated.speechtotext.audio;
 
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.util.Log;
 
 import java.io.IOException;
+
+import javax.inject.Inject;
+
 
 public class AudioService {
 
@@ -13,6 +16,9 @@ public class AudioService {
     private MediaRecorder mediaRecorder = null;
 
     private MediaPlayer mediaPlayer = null;
+
+    @Inject
+    public AudioService() {}
 
     public void startRecording(String filename) {
         mediaRecorder = new MediaRecorder();
@@ -56,7 +62,7 @@ public class AudioService {
         }
     }
 
-    public void shutdown(){
+    public void shutdown() {
         if (mediaRecorder != null) {
             mediaRecorder.release();
             mediaRecorder = null;
