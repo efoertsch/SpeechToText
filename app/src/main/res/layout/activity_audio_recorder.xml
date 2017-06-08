@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context="com.fisincorporated.speechtotext.audio.AudioRecorderActivity">
+        tools:context="com.fisincorporated.speechtotext.audio.AudioRecordActivity">
 
     <data class="AudioRecordingBinding">
 
@@ -21,14 +21,50 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
+
             android:orientation="vertical">
 
-            <include layout="@layout/simple_toolbar"/>
+            <include
+                android:id="@+id/toolbar_layout"
+                layout="@layout/simple_toolbar"/>
+
+            <LinearLayout
+                android:id="@+id/activity_audio_record_microphone_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin_double"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/microphone_imageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:orientation="vertical"
+                    android:padding="50dp"
+                    android:src="@drawable/ic_mic_black_48dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/tap_to_stop_recording"
+                    android:layout_marginBottom="@dimen/margin_standard"/>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/divider_drawable"/>
+
+            </LinearLayout>
+
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/activity_recorder_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="wrap_content"
+                />
         </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
