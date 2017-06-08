@@ -9,13 +9,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 
 import com.fisincorporated.speechtotext.R;
-import com.fisincorporated.speechtotext.dagger.ActivityComponent;
-import com.fisincorporated.speechtotext.dagger.ActivityModule;
-import com.fisincorporated.speechtotext.dagger.DaggerActivityComponent;
 
 import javax.inject.Inject;
 
-public class AudioRecorderActivity extends AppCompatActivity {
+import dagger.android.AndroidInjection;
+
+public class AudioRecordActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "AudioRecordTest";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
@@ -30,20 +29,19 @@ public class AudioRecorderActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        // Do this before super.onCreate in case the activity uses fragments
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        ActivityComponent activityComponent;
-        activityComponent = DaggerActivityComponent.builder().activityModule(new ActivityModule(this)).build();
-        activityComponent.inject(this);
+
         setContentView(R.layout.activity_audio_recorder);
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
         audioRecorderViewModel.setView((ViewGroup) findViewById(android.R.id.content));
-
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-
+    public void onDestroy() {
+        super.onDestroy();
+        audioRecorderViewModel.onDestroy();
     }
 
     @Override
@@ -55,6 +53,5 @@ public class AudioRecorderActivity extends AppCompatActivity {
                 break;
         }
         if (!permissionToRecordAccepted) finish();
-
     }
 }

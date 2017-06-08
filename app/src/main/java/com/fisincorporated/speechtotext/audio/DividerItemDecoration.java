@@ -1,4 +1,4 @@
-package com.fisincorporated.speechtotext;
+package com.fisincorporated.speechtotext.audio;
 
 import android.content.Context;
 import android.content.res.TypedArray;

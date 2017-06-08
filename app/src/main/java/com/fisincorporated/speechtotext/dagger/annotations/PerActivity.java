@@ -1,4 +1,4 @@
-package com.fisincorporated.speechtotext.dagger.custom;
+package com.fisincorporated.speechtotext.dagger.annotations;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

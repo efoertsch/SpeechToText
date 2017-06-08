@@ -9,7 +9,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.fisincorporated.speechtotext.R;
-import com.fisincorporated.speechtotext.dagger.custom.PerActivity;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,7 +18,6 @@ import javax.inject.Inject;
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;
 
-@PerActivity
 public class AudioRecordAdapter extends RealmRecyclerViewAdapter<AudioRecord, AudioRecordAdapter.MyViewHolder> {
 
     private boolean inDeletionMode = false;

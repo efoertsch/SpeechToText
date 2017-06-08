@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme.NoActionBar"
         android:name=".application.AudioApplication">
         <activity
-            android:name=".audio.AudioRecorderActivity"
+            android:name=".audio.AudioRecordActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
