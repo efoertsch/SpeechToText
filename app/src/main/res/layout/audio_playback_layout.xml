@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context="com.fisincorporated.speechtotext.audio.list.AudioListActivity">
+
+    <data class="AudioPlaybackBinding">
+
+        <variable
+            name="viewmodel"
+            type="com.fisincorporated.speechtotext.audio.playback.AudioPlaybackViewModel"/>
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/audio_playback_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/toolbar_layout"
+                layout="@layout/simple_toolbar"/>
+
+            <LinearLayout
+                android:id="@+id/audio_playback_view"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="@dimen/margin_standard"
+                android:layout_marginEnd="@dimen/margin_standard"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/description_colon"
+                        android:textSize="14sp"
+                        />
+
+                    <TextView
+                        android:id="@+id/audio_playback_description"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="@dimen/margin_standard"
+                        android:text="Now playing.."
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/audio_record_date"
+                        android:textSize="14sp"
+                        />
+
+                    <TextView
+                        android:id="@+id/audio_playback_record_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="@dimen/margin_standard"
+                        android:text="2017-06-17"
+                        android:textSize="16sp"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/audio_playback_speech_to_text"
+                        android:textSize="14sp"
+                        />
+
+                    <TextView
+                        android:id="@+id/audio_playback_speech_to_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_standard"
+                        android:scrollbars="horizontal"
+                        android:text="Four Score and Seven Years Ago, yada yada yada"
+                        android:textSize="16sp"
+                        />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</layout>

@@ -4,6 +4,8 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -24,8 +26,8 @@ public class AudioService {
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mediaRecorder.setOutputFile(filename);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mediaRecorder.setOutputFile(filename);
 
         try {
             mediaRecorder.prepare();
@@ -36,9 +38,17 @@ public class AudioService {
         mediaRecorder.start();
     }
 
+    // TODO implement pause and continue
+//    public void pauseRecording() {
+//        if (mediaRecorder != null) {
+//
+//        }
+//    }
+
     public void stopRecording() {
         if (mediaRecorder != null) {
             mediaRecorder.stop();
+            mediaRecorder.reset();
             mediaRecorder.release();
             mediaRecorder = null;
         }
@@ -47,7 +57,10 @@ public class AudioService {
     public void startPlaying(String fileName) {
         mediaPlayer = new MediaPlayer();
         try {
-            mediaPlayer.setDataSource(fileName);
+            File file = new File(fileName);
+            FileInputStream inputStream = new FileInputStream(file);
+            mediaPlayer.setDataSource(inputStream.getFD());
+            inputStream.close();
             mediaPlayer.prepare();
             mediaPlayer.start();
         } catch (IOException e) {

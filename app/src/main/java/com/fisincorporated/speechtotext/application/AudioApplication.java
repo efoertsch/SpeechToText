@@ -2,6 +2,7 @@ package com.fisincorporated.speechtotext.application;
 
 import android.app.Activity;
 import android.app.Application;
+import android.util.Log;
 
 import com.fisincorporated.speechtotext.audio.AudioRecord;
 import com.fisincorporated.speechtotext.dagger.application.DaggerApplicationComponent;
@@ -14,6 +15,7 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
 public class AudioApplication extends Application implements HasDispatchingActivityInjector {
+    private static final String TAG = AudioApplication.class.getSimpleName();
 
     @Inject
     DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
@@ -50,9 +52,11 @@ public class AudioApplication extends Application implements HasDispatchingActiv
                     }
                 })
                 .build();
-        //Realm.deleteRealm(realmConfig); // Delete Realm between app restarts.
+        Realm.deleteRealm(realmConfig); // Delete Realm between app restarts.
         Realm.setDefaultConfiguration(realmConfig);
+        Realm realm = Realm.getDefaultInstance();
+        long count = realm.where(AudioRecord.class).count();
+        Log.d(TAG, "number of audio records:" + count);
+
     }
-
-
 }

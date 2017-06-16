@@ -17,14 +17,14 @@ public class AudioRecord extends RealmObject {
     private static final SimpleDateFormat recordDate = new SimpleDateFormat("yyyy-MM-dd:HH:mm", Locale.getDefault());
 
     public enum FIELDS{
-        millisecId,
+        id,
         recordDataTime,
         audioFileName,
         description;
     }
 
     @Index
-    private long millisecId;
+    private long id;
 
     @Required
     private String recordDateTime;
@@ -34,25 +34,26 @@ public class AudioRecord extends RealmObject {
 
     private String description;
 
+    private String speachToTextTranslation;
+
+
     @Inject
     public AudioRecord(){}
 
-    public AudioRecord(long millisecId, String audioFileName ){
-        this.millisecId = millisecId;
+    public AudioRecord(long id, String audioFileName ){
+        this.id = id;
         this.audioFileName = audioFileName;
-        recordDateTime = recordDate.format(new Date(millisecId));
+        recordDateTime = recordDate.format(new Date(id));
     }
 
-    public long getMillisecId() {
-        return millisecId;
+    public long getId() {
+        return id;
     }
 
-    public void setMillisecId(long millisecId) {
-        this.millisecId = millisecId;
+    public void setId(long id) {
+        this.id = id;
+        recordDateTime = recordDate.format(new Date(id));
     }
-
-    private String translatedText;
-
 
     public String getRecordDateTime() {
         return recordDateTime;
@@ -78,17 +79,17 @@ public class AudioRecord extends RealmObject {
         this.description = description;
     }
 
-    public String getTranslatedText() {
-        return translatedText;
+    public String getSpeachToTextTranslation() {
+        return speachToTextTranslation;
     }
 
-    public void setTranslatedText(String translatedText) {
-        this.translatedText = translatedText;
+    public void setSpeachToTextTranslation(String speachToTextTranslation) {
+        this.speachToTextTranslation = speachToTextTranslation;
     }
 
 
-    static void delete(Realm realm, long id) {
-        AudioRecord audioRecord = realm.where(AudioRecord.class).equalTo(FIELDS.millisecId.name(), id).findFirst();
+    public static void delete(Realm realm, long id) {
+        AudioRecord audioRecord = realm.where(AudioRecord.class).equalTo(FIELDS.id.name(), id).findFirst();
         // Otherwise it has been deleted already.
         if (audioRecord != null) {
             audioRecord.deleteFromRealm();
