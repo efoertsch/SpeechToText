@@ -3,13 +3,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context="com.fisincorporated.speechtotext.audio.list.AudioListActivity">
+        tools:context=".ui.list.AudioListActivity">
 
     <data class="AudioDescriptionInputBinding">
 
         <variable
             name="viewModel"
-            type="com.fisincorporated.speechtotext.audio.record.AudioRecordViewModel"/>
+            type="com.fisincorporated.speechtotext.ui.record.AudioRecordViewModel"/>
     </data>
 
     <LinearLayout

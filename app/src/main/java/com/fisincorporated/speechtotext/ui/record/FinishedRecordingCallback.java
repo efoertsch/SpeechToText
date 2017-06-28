@@ -1,4 +1,4 @@
-package com.fisincorporated.speechtotext.audio.record;
+package com.fisincorporated.speechtotext.ui.record;
 
 public interface FinishedRecordingCallback {
 

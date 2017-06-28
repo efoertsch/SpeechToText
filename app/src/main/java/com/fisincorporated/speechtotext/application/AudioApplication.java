@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.util.Log;
 
-import com.fisincorporated.speechtotext.audio.AudioRecord;
+import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 import com.fisincorporated.speechtotext.dagger.application.DaggerApplicationComponent;
 
 import javax.inject.Inject;
@@ -52,7 +52,7 @@ public class AudioApplication extends Application implements HasDispatchingActiv
                     }
                 })
                 .build();
-        Realm.deleteRealm(realmConfig); // Delete Realm between app restarts.
+        //Realm.deleteRealm(realmConfig); // Delete Realm between app restarts.
         Realm.setDefaultConfiguration(realmConfig);
         Realm realm = Realm.getDefaultInstance();
         long count = realm.where(AudioRecord.class).count();

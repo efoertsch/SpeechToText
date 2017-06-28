@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context="com.fisincorporated.speechtotext.audio.list.AudioListActivity">
+        tools:context=".ui.playback.AudioPlaybackActivity">
 
     <data class="AudioPlaybackBinding">
 
         <variable
-            name="viewmodel"
-            type="com.fisincorporated.speechtotext.audio.playback.AudioPlaybackViewModel"/>
+            name="data"
+            type="com.fisincorporated.speechtotext.audio.data.AudioRecordInfo"/>
     </data>
 
     <android.support.design.widget.CoordinatorLayout
@@ -47,8 +47,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="@string/description_colon"
-                        android:textSize="14sp"
-                        />
+                        android:textSize="14sp"/>
 
                     <TextView
                         android:id="@+id/audio_playback_description"
@@ -56,7 +55,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="@dimen/margin_standard"
-                        android:text="Now playing.."
+                        tools:text="Test Audio1"
+                        android:text="@{data.description}"
                         android:textSize="16sp"/>
 
                 </LinearLayout>
@@ -80,7 +80,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="@dimen/margin_standard"
-                        android:text="2017-06-17"
+                        tools:text="2017-06-29:08:27"
+                        android:text="@{data.recordDateTime}"
                         android:textSize="16sp"
                         />
 
@@ -104,13 +105,20 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/margin_standard"
                         android:scrollbars="horizontal"
-                        android:text="Four Score and Seven Years Ago, yada yada yada"
+                        android:text="@{data.speachToTextTranslation}"
+                        tools:text="Four score and seven years ago our fathers brought forth, upon this continent, a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived, and so dedicated, can long endure."
                         android:textSize="16sp"
                         />
 
                 </LinearLayout>
 
             </LinearLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/audio_playback_media_controller">
+
+            </RelativeLayout>
 
         </LinearLayout>
 

@@ -1,4 +1,4 @@
-package com.fisincorporated.speechtotext.audio;
+package com.fisincorporated.speechtotext.ui;
 
 import android.Manifest;
 import android.content.pm.PackageManager;

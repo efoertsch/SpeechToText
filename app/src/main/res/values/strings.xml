@@ -9,6 +9,7 @@
     <string name="cancel_delete_audio">Cancel/Delete Audio</string>
     <string name="audio_list_activity_title">Audio List</string>
     <string name="audio_record_activity_title">Record Audio</string>
+    <string name="audio_playback">Audio Playback</string>
 
 
     <string name="title_activity_audio_record">AudioRecordActivity</string>
@@ -16,4 +17,13 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="audio_record_date">Record date:</string>
     <string name="audio_playback_speech_to_text">Translated Speech to Text:</string>
+
+
+    <string name="media_player_error_load_timeout">MediaPlayer - Timed Out.</string>
+    <string name="media_player_error_mserver_unaccessible">MediaPlayer - Server inaccessible.</string>
+    <string name="media_player_error_unknown_error">MediaPlayer - Unknown error.</string>
+    <string name="media_player_error_io_error">IO error.</string>
+    <string name="media_player_error_malformed_bitstream">Malformed bitstream.</string>
+    <string name="media_player_error_unsupported_media">Unsupported media.</string>
+    <string name="media_player_error_timed_out">Operation took to long to perform.</string>
 </resources>

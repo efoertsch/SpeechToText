@@ -1,4 +1,4 @@
-package com.fisincorporated.speechtotext.audio.record;
+package com.fisincorporated.speechtotext.ui.record;
 
 
 
@@ -11,7 +11,7 @@ import android.widget.EditText;
 
 import com.fisincorporated.speechtotext.R;
 import com.fisincorporated.speechtotext.application.ViewModelLifeCycle;
-import com.fisincorporated.speechtotext.audio.AudioRecord;
+import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 import com.fisincorporated.speechtotext.audio.AudioService;
 import com.fisincorporated.speechtotext.audio.utils.AudioUtils;
 import com.fisincorporated.speechtotext.databinding.AudioDescriptionInputBinding;

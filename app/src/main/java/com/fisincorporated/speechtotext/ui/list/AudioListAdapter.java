@@ -1,4 +1,4 @@
-package com.fisincorporated.speechtotext.audio.list;
+package com.fisincorporated.speechtotext.ui.list;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.fisincorporated.speechtotext.R;
 import com.fisincorporated.speechtotext.audio.PlayAudioCallback;
-import com.fisincorporated.speechtotext.audio.AudioRecord;
+import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 
 import javax.inject.Inject;
 

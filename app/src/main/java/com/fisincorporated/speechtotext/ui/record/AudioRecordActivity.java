@@ -1,9 +1,9 @@
-package com.fisincorporated.speechtotext.audio.record;
+package com.fisincorporated.speechtotext.ui.record;
 
 import android.os.Bundle;
 
 import com.fisincorporated.speechtotext.R;
-import com.fisincorporated.speechtotext.audio.AudioBaseActivity;
+import com.fisincorporated.speechtotext.ui.AudioBaseActivity;
 
 import javax.inject.Inject;
 

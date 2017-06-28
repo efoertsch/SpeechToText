@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
         <activity
-            android:name=".audio.list.AudioListActivity"
+            android:name=".ui.list.AudioListActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -23,13 +23,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".audio.record.AudioRecordActivity"
+            android:name=".ui.record.AudioRecordActivity"
             android:screenOrientation="portrait"
            >
         </activity>
 
         <activity
-            android:name=".audio.playback.AudioPlaybackActivity"
+            android:name=".ui.playback.AudioPlaybackActivity"
             android:screenOrientation="portrait"
             >
         </activity>

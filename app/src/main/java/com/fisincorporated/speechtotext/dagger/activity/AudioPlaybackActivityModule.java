@@ -2,8 +2,8 @@ package com.fisincorporated.speechtotext.dagger.activity;
 
 
 import com.fisincorporated.speechtotext.audio.AudioService;
-import com.fisincorporated.speechtotext.audio.playback.AudioPlaybackActivity;
-import com.fisincorporated.speechtotext.audio.playback.AudioPlaybackViewModel;
+import com.fisincorporated.speechtotext.ui.playback.AudioPlaybackActivity;
+import com.fisincorporated.speechtotext.ui.playback.AudioPlaybackViewModel;
 
 import javax.inject.Singleton;
 

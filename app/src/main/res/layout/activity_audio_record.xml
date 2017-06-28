@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context="com.fisincorporated.speechtotext.audio.list.AudioRecordActivity">
+        tools:context=".ui.list.AudioRecordActivity">
 
     <data class="AudioRecordBinding">
 
         <variable
             name="viewmodel"
-            type="com.fisincorporated.speechtotext.audio.record.AudioRecordViewModel"/>
+            type="com.fisincorporated.speechtotext.ui.record.AudioRecordViewModel"/>
     </data>
 
     <android.support.design.widget.CoordinatorLayout

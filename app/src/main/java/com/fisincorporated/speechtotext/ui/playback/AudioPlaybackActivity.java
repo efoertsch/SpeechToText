@@ -1,10 +1,10 @@
-package com.fisincorporated.speechtotext.audio.playback;
+package com.fisincorporated.speechtotext.ui.playback;
 
 import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.fisincorporated.speechtotext.R;
-import com.fisincorporated.speechtotext.audio.AudioBaseActivity;
+import com.fisincorporated.speechtotext.ui.AudioBaseActivity;
 
 import javax.inject.Inject;
 
@@ -25,9 +25,7 @@ public class AudioPlaybackActivity extends AudioBaseActivity {
         // Do this before super.onCreate in case the activity uses fragments
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.audio_playback_layout);
-
         setupToolbar();
         toolbar.setTitle(R.string.audio_record_activity_title);
 

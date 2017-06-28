@@ -1,6 +1,6 @@
 package com.fisincorporated.speechtotext.dagger.activity;
 
-import com.fisincorporated.speechtotext.audio.record.AudioRecordActivity;
+import com.fisincorporated.speechtotext.ui.record.AudioRecordActivity;
 
 import dagger.Subcomponent;
 import dagger.android.AndroidInjector;

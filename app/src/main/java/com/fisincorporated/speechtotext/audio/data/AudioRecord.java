@@ -1,4 +1,4 @@
-package com.fisincorporated.speechtotext.audio;
+package com.fisincorporated.speechtotext.audio.data;
 
 
 import java.text.SimpleDateFormat;
@@ -12,7 +12,7 @@ import io.realm.RealmObject;
 import io.realm.annotations.Index;
 import io.realm.annotations.Required;
 
-public class AudioRecord extends RealmObject {
+public class AudioRecord extends RealmObject implements AudioRecordInfo {
 
     private static final SimpleDateFormat recordDate = new SimpleDateFormat("yyyy-MM-dd:HH:mm", Locale.getDefault());
 

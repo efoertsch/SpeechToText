@@ -1,10 +1,10 @@
 package com.fisincorporated.speechtotext.dagger.activity;
 
 
-import com.fisincorporated.speechtotext.audio.AudioRecord;
-import com.fisincorporated.speechtotext.audio.list.AudioListActivity;
-import com.fisincorporated.speechtotext.audio.list.AudioListAdapter;
-import com.fisincorporated.speechtotext.audio.list.AudioListViewModel;
+import com.fisincorporated.speechtotext.audio.data.AudioRecord;
+import com.fisincorporated.speechtotext.ui.list.AudioListActivity;
+import com.fisincorporated.speechtotext.ui.list.AudioListAdapter;
+import com.fisincorporated.speechtotext.ui.list.AudioListViewModel;
 
 import dagger.Module;
 import dagger.Provides;
