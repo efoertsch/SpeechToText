@@ -15,6 +15,7 @@ import com.fisincorporated.speechtotext.audio.AudioService;
 import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 import com.fisincorporated.speechtotext.audio.utils.AudioUtils;
 import com.fisincorporated.speechtotext.databinding.AudioPlaybackBinding;
+import com.fisincorporated.speechtotext.ui.AudioBaseViewModel;
 
 import java.io.IOException;
 
@@ -22,7 +23,8 @@ import javax.inject.Inject;
 
 import io.realm.Realm;
 
-public class AudioPlaybackViewModel implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener,  MediaController.MediaPlayerControl,  MediaPlayer.OnErrorListener{
+public class AudioPlaybackViewModel extends AudioBaseViewModel implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener,  MediaController.MediaPlayerControl,
+        MediaPlayer.OnErrorListener {
     private static final String TAG = AudioPlaybackViewModel.class.getSimpleName();
 
     private View bindingView;
@@ -46,10 +48,10 @@ public class AudioPlaybackViewModel implements MediaPlayer.OnPreparedListener, M
     private Handler handler = new Handler();
 
     @Inject
-    public AudioPlaybackViewModel(Context context, AudioService audioService) {
+    public AudioPlaybackViewModel(Context context, AudioService audioService, Realm realm) {
         this.context = context;
         this.audioService = audioService;
-        realm = Realm.getDefaultInstance();
+        this.realm = realm;
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnPreparedListener(this);
         mediaPlayer.setOnCompletionListener(this);
@@ -202,6 +204,7 @@ public class AudioPlaybackViewModel implements MediaPlayer.OnPreparedListener, M
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-
     }
+
+
 }

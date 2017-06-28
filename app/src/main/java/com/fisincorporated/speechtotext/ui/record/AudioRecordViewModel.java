@@ -10,12 +10,12 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.fisincorporated.speechtotext.R;
-import com.fisincorporated.speechtotext.application.ViewModelLifeCycle;
-import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 import com.fisincorporated.speechtotext.audio.AudioService;
+import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 import com.fisincorporated.speechtotext.audio.utils.AudioUtils;
 import com.fisincorporated.speechtotext.databinding.AudioDescriptionInputBinding;
 import com.fisincorporated.speechtotext.databinding.AudioRecordBinding;
+import com.fisincorporated.speechtotext.ui.AudioBaseViewModel;
 
 import java.util.Date;
 import java.util.UUID;
@@ -23,9 +23,8 @@ import java.util.UUID;
 import javax.inject.Inject;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 
-public class AudioRecordViewModel implements ViewModelLifeCycle, FinishedRecordingCallback {
+public class AudioRecordViewModel extends AudioBaseViewModel implements  FinishedRecordingCallback {
 
     private View bindingView;
 
@@ -45,11 +44,10 @@ public class AudioRecordViewModel implements ViewModelLifeCycle, FinishedRecordi
 
 
     @Inject
-    public AudioRecordViewModel(Context context, AudioService audioService) {
+    public AudioRecordViewModel(Context context, AudioService audioService, Realm realm) {
         this.context = context;
         this.audioService = audioService;
-        realm = Realm.getDefaultInstance();
-
+        this.realm = realm;
     }
 
     public AudioRecordViewModel setView(View view) {
@@ -75,7 +73,7 @@ public class AudioRecordViewModel implements ViewModelLifeCycle, FinishedRecordi
     public void startRecording() {
         String audioFileName = UUID.randomUUID().toString() + ".3gp";
         String absoluteFilename = AudioUtils.getAbsoluteFileName(context, audioFileName);
-        audioRecord = createAudioRecord(new Date(), audioFileName);
+        audioRecord = AudioUtils.createAudioRecord(new Date(), audioFileName);
         audioService.startRecording(absoluteFilename);
     }
 
@@ -83,29 +81,6 @@ public class AudioRecordViewModel implements ViewModelLifeCycle, FinishedRecordi
             audioService.stopRecording();
     }
 
-    private AudioRecord createAudioRecord(final Date currentDate, final String audioFileName) {
-        realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                AudioRecord audioRecord = realm.createObject(AudioRecord.class);
-                audioRecord.setId(currentDate.getTime());
-                audioRecord.setAudioFileName(audioFileName);
-                realm.insertOrUpdate(audioRecord);
-
-            }
-        });
-
-        RealmResults<AudioRecord> list = realm.where(AudioRecord.class).equalTo("id", currentDate.getTime()).findAll();
-        return (list.size() > 0 ? list.get(0) : null);
-    }
-
-    private void saveDescriptionWithAudio(final String description) {
-        Realm.getDefaultInstance().executeTransaction(realm1 -> {
-            audioRecord.setDescription(description);
-            realm1.insertOrUpdate(audioRecord);
-        });
-    }
 
     private void getAudioDescription() {
         AudioDescriptionInputBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.audio_description_input, null, false);
@@ -119,12 +94,11 @@ public class AudioRecordViewModel implements ViewModelLifeCycle, FinishedRecordi
                 .setPositiveButton(R.string.save, (dialogBox, id) -> {
                     String description = userInputDialogEditText.getText().toString();
                     if (description != null) {
-                        saveDescriptionWithAudio(description);
+                        AudioUtils.saveDescriptionWithAudio(audioRecord, description);
                         dialogBox.dismiss();
                         finish();
                     }
                 })
-
                 .setNegativeButton(R.string.cancel_delete_audio,
                         (dialogBox, id) -> {
                            // deleteAudio();
@@ -141,27 +115,6 @@ public class AudioRecordViewModel implements ViewModelLifeCycle, FinishedRecordi
     private void finish(){
         audioService.stopRecording();
         finishedRecording();
-    }
-
-    @Override
-    public void onResume() {
-
-    }
-
-    @Override
-    public void onPause() {
-
-    }
-
-    @Override
-    public void onStop() {
-
-    }
-
-    @Override
-    public void onDestroy() {
-        audioService.stopRecording();
-
     }
 
     @Override

@@ -54,4 +54,10 @@ public class AudioPlaybackActivity extends AudioBaseActivity {
         finish();
     }
 
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        viewModel.onDestroy();
+    }
+
 }

@@ -42,4 +42,10 @@ public class AudioRecordActivity extends AudioBaseActivity  implements FinishedR
     public void finishedRecording() {
         finish();
     }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        audioRecordViewModel.onDestroy();
+    }
 }

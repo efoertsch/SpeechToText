@@ -30,6 +30,10 @@ public class AudioListActivity extends AudioBaseActivity {
         audioListViewModel.setView(findViewById(android.R.id.content));
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        audioListViewModel.onDestroy();
+    }
 
 }

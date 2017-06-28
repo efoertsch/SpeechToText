@@ -11,18 +11,19 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 
 import com.fisincorporated.speechtotext.R;
-import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 import com.fisincorporated.speechtotext.audio.DividerItemDecoration;
 import com.fisincorporated.speechtotext.audio.PlayAudioCallback;
+import com.fisincorporated.speechtotext.audio.data.AudioRecord;
+import com.fisincorporated.speechtotext.databinding.AudioListBinding;
+import com.fisincorporated.speechtotext.ui.AudioBaseViewModel;
 import com.fisincorporated.speechtotext.ui.playback.AudioPlaybackActivity;
 import com.fisincorporated.speechtotext.ui.record.AudioRecordActivity;
-import com.fisincorporated.speechtotext.databinding.AudioListBinding;
 
 import javax.inject.Inject;
 
 import io.realm.Realm;
 
-public class AudioListViewModel implements PlayAudioCallback {
+public class AudioListViewModel extends AudioBaseViewModel implements PlayAudioCallback  {
 
     private View bindingView;
 
@@ -41,10 +42,10 @@ public class AudioListViewModel implements PlayAudioCallback {
     private AudioListAdapter audioListAdapter;
 
     @Inject
-    public AudioListViewModel(Context context, AudioListAdapter audioListAdapter) {
+    public AudioListViewModel(Context context, AudioListAdapter audioListAdapter, Realm realm) {
         this.context = context;
         this.audioListAdapter = audioListAdapter;
-        realm = Realm.getDefaultInstance();
+        this.realm = realm;
         audioListAdapter.setPlayAudioCallback(this);
     }
 
