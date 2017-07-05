@@ -72,8 +72,8 @@ public class AudioRecordViewModel extends AudioBaseViewModel implements  Finishe
 
     public void startRecording() {
         String audioFileName = UUID.randomUUID().toString() + ".3gp";
-        String absoluteFilename = AudioUtils.getAbsoluteFileName(context, audioFileName);
-        audioRecord = AudioUtils.createAudioRecord(new Date(), audioFileName);
+        String absoluteFilename = AudioUtils.getAbsoluteFileName(audioFileName);
+        audioRecord = AudioUtils.createAudioRecord(realm, new Date(), audioFileName);
         audioService.startRecording(absoluteFilename);
     }
 
@@ -94,7 +94,7 @@ public class AudioRecordViewModel extends AudioBaseViewModel implements  Finishe
                 .setPositiveButton(R.string.save, (dialogBox, id) -> {
                     String description = userInputDialogEditText.getText().toString();
                     if (description != null) {
-                        AudioUtils.saveDescriptionWithAudio(audioRecord, description);
+                        AudioUtils.saveDescriptionWithAudio(realm, audioRecord, description);
                         dialogBox.dismiss();
                         finish();
                     }

@@ -1,6 +1,8 @@
 package com.fisincorporated.speechtotext.audio.data;
 
 
+import com.fisincorporated.speechtotext.audio.utils.AudioUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -16,7 +18,7 @@ public class AudioRecord extends RealmObject implements AudioRecordInfo {
 
     private static final SimpleDateFormat recordDate = new SimpleDateFormat("yyyy-MM-dd:HH:mm", Locale.getDefault());
 
-    public enum FIELDS{
+    public enum FIELDS {
         id,
         recordDataTime,
         audioFileName,
@@ -38,9 +40,10 @@ public class AudioRecord extends RealmObject implements AudioRecordInfo {
 
 
     @Inject
-    public AudioRecord(){}
+    public AudioRecord() {
+    }
 
-    public AudioRecord(long id, String audioFileName ){
+    public AudioRecord(long id, String audioFileName) {
         this.id = id;
         this.audioFileName = audioFileName;
         recordDateTime = recordDate.format(new Date(id));
@@ -87,11 +90,11 @@ public class AudioRecord extends RealmObject implements AudioRecordInfo {
         this.speachToTextTranslation = speachToTextTranslation;
     }
 
-
     public static void delete(Realm realm, long id) {
         AudioRecord audioRecord = realm.where(AudioRecord.class).equalTo(FIELDS.id.name(), id).findFirst();
         // Otherwise it has been deleted already.
         if (audioRecord != null) {
+            AudioUtils.deleteAudioFile(audioRecord.getAudioFileName());
             audioRecord.deleteFromRealm();
         }
     }

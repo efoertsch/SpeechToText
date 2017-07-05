@@ -49,14 +49,14 @@
                         android:text="@string/description_colon"
                         android:textSize="14sp"/>
 
-                    <TextView
+                    <EditText
                         android:id="@+id/audio_playback_description"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="@dimen/margin_standard"
                         tools:text="Test Audio1"
-                        android:text="@{data.description}"
+                        android:text="@={data.description}"
                         android:textSize="16sp"/>
 
                 </LinearLayout>
@@ -99,13 +99,13 @@
                         android:textSize="14sp"
                         />
 
-                    <TextView
+                    <EditText
                         android:id="@+id/audio_playback_speech_to_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/margin_standard"
                         android:scrollbars="horizontal"
-                        android:text="@{data.speachToTextTranslation}"
+                        android:text="@={data.speachToTextTranslation}"
                         tools:text="Four score and seven years ago our fathers brought forth, upon this continent, a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived, and so dedicated, can long endure."
                         android:textSize="16sp"
                         />

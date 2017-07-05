@@ -22,7 +22,10 @@ public class AudioApplication extends Application implements HasDispatchingActiv
     public void onCreate() {
         super.onCreate();
         createDaggerInjections();
-        AudioUtils.configureRealm(this);
+        AudioUtils.setContext(this);
+        AudioUtils.configureRealm();
+        AudioUtils.listAudioFiles();
+        AudioUtils.createMissingAudioRecords();
     }
 
     protected void createDaggerInjections() {

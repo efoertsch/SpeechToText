@@ -85,7 +85,7 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements MediaP
 
     private  void startPlaying(AudioRecord audioRecord) {
         try {
-            audioFile = AudioUtils.getAbsoluteFileName(context, audioRecord.getAudioFileName());
+            audioFile = AudioUtils.getAbsoluteFileName(audioRecord.getAudioFileName());
             mediaPlayer.reset();
             mediaPlayer.setDataSource(audioFile);
             mediaPlayer.prepare();
