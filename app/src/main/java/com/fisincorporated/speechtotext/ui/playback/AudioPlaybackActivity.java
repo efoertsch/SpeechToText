@@ -27,7 +27,7 @@ public class AudioPlaybackActivity extends AudioBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.audio_playback_layout);
         setupToolbar();
-        toolbar.setTitle(R.string.audio_record_activity_title);
+        toolbar.setTitle(R.string.audio_playback_activity_title);
 
         viewModel.setView(findViewById(android.R.id.content));
     }

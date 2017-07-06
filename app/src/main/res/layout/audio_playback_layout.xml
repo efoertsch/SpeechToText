@@ -9,6 +9,9 @@
         <variable
             name="data"
             type="com.fisincorporated.speechtotext.audio.data.AudioRecordInfo"/>
+        <variable
+            name="viewModel"
+            type="com.fisincorporated.speechtotext.ui.playback.AudioPlaybackViewModel"/>
     </data>
 
     <android.support.design.widget.CoordinatorLayout
@@ -18,7 +21,7 @@
         android:fitsSystemWindows="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:animateLayoutChanges="true"
@@ -32,9 +35,10 @@
                 android:id="@+id/audio_playback_view"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/toolbar_layout"
                 android:layout_gravity="center"
-                android:layout_marginStart="@dimen/margin_standard"
                 android:layout_marginEnd="@dimen/margin_standard"
+                android:layout_marginStart="@dimen/margin_standard"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -55,35 +59,9 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="@dimen/margin_standard"
-                        tools:text="Test Audio1"
                         android:text="@={data.description}"
-                        android:textSize="16sp"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/audio_record_date"
-                        android:textSize="14sp"
-                        />
-
-                    <TextView
-                        android:id="@+id/audio_playback_record_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/margin_standard"
-                        tools:text="2017-06-29:08:27"
-                        android:text="@{data.recordDateTime}"
                         android:textSize="16sp"
-                        />
+                        tools:text="Test Audio1"/>
 
                 </LinearLayout>
 
@@ -106,21 +84,62 @@
                         android:layout_marginStart="@dimen/margin_standard"
                         android:scrollbars="horizontal"
                         android:text="@={data.speachToTextTranslation}"
-                        tools:text="Four score and seven years ago our fathers brought forth, upon this continent, a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived, and so dedicated, can long endure."
                         android:textSize="16sp"
+                        tools:text="Four score and seven years ago our fathers brought forth, upon this continent, a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived, and so dedicated, can long endure."
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/audio_record_date"
+                        android:textSize="14sp"
+                        />
+
+                    <TextView
+                        android:id="@+id/audio_playback_record_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="@dimen/margin_standard"
+                        android:text="@{data.recordDateTime}"
+                        android:textSize="16sp"
+                        tools:text="2017-06-29:08:27"
                         />
 
                 </LinearLayout>
 
             </LinearLayout>
+
             <RelativeLayout
+                android:id="@+id/audio_playback_media_controller"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/audio_playback_media_controller">
+                android:layout_marginEnd="@dimen/margin_standard"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="@dimen/margin_standard"
+                android:layout_above="@+id/audio_playback_save_btn"
+               >
 
             </RelativeLayout>
 
-        </LinearLayout>
+            <Button
+                android:id="@+id/audio_playback_save_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/save"
+                android:layout_alignParentBottom="true"
+                android:onClick="@{() -> viewModel.updateAudioRecord()}"/>
+
+
+        </RelativeLayout>
 
     </android.support.design.widget.CoordinatorLayout>
 

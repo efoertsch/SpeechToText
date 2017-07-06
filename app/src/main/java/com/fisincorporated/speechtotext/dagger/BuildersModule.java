@@ -2,12 +2,12 @@ package com.fisincorporated.speechtotext.dagger;
 
 import android.app.Activity;
 
-import com.fisincorporated.speechtotext.ui.list.AudioListActivity;
-import com.fisincorporated.speechtotext.ui.playback.AudioPlaybackActivity;
-import com.fisincorporated.speechtotext.ui.record.AudioRecordActivity;
 import com.fisincorporated.speechtotext.dagger.activity.AudioListActivitySubComponent;
 import com.fisincorporated.speechtotext.dagger.activity.AudioPlaybackActivitySubComponent;
 import com.fisincorporated.speechtotext.dagger.activity.AudioRecordActivitySubComponent;
+import com.fisincorporated.speechtotext.ui.list.AudioListActivity;
+import com.fisincorporated.speechtotext.ui.playback.AudioPlaybackActivity;
+import com.fisincorporated.speechtotext.ui.record.AudioRecordActivity;
 
 import dagger.Binds;
 import dagger.Module;

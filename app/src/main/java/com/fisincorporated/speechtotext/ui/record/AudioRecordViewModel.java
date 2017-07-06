@@ -12,7 +12,7 @@ import android.widget.EditText;
 import com.fisincorporated.speechtotext.R;
 import com.fisincorporated.speechtotext.audio.AudioService;
 import com.fisincorporated.speechtotext.audio.data.AudioRecord;
-import com.fisincorporated.speechtotext.audio.utils.AudioUtils;
+import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
 import com.fisincorporated.speechtotext.databinding.AudioDescriptionInputBinding;
 import com.fisincorporated.speechtotext.databinding.AudioRecordBinding;
 import com.fisincorporated.speechtotext.ui.AudioBaseViewModel;
@@ -22,17 +22,9 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import io.realm.Realm;
-
-public class AudioRecordViewModel extends AudioBaseViewModel implements  FinishedRecordingCallback {
-
-    private View bindingView;
+public class AudioRecordViewModel extends AudioBaseViewModel implements FinishedRecordingCallback {
 
     private Context context;
-
-    private Realm realm;
-
-    private View microphoneLayout;
 
     private AudioRecord audioRecord;
 
@@ -42,20 +34,22 @@ public class AudioRecordViewModel extends AudioBaseViewModel implements  Finishe
 
     private FinishedRecordingCallback finishedRecordingCallBack;
 
+    private AudioRecordUtils audioRecordUtils;
+
 
     @Inject
-    public AudioRecordViewModel(Context context, AudioService audioService, Realm realm) {
+    public AudioRecordViewModel(Context context, AudioService audioService, AudioRecordUtils audioRecordUtils) {
         this.context = context;
         this.audioService = audioService;
-        this.realm = realm;
+        this.audioRecordUtils = audioRecordUtils;
     }
 
     public AudioRecordViewModel setView(View view) {
-        bindingView = view.findViewById(R.id.activity_record_layout);
+        View bindingView = view.findViewById(R.id.activity_record_layout);
         viewDataBinding = DataBindingUtil.bind(bindingView);
         viewDataBinding.setViewmodel(this);
 
-        microphoneLayout = viewDataBinding.activityAudioRecordMicrophoneLayout;
+        View microphoneLayout = viewDataBinding.activityAudioRecordMicrophoneLayout;
         microphoneLayout.setOnClickListener(v -> {
             stopRecording();
             getAudioDescription();
@@ -65,20 +59,20 @@ public class AudioRecordViewModel extends AudioBaseViewModel implements  Finishe
         return this;
     }
 
-    public AudioRecordViewModel setFinishedRecordingCallback(FinishedRecordingCallback finishedRecordigCallback){
+    public AudioRecordViewModel setFinishedRecordingCallback(FinishedRecordingCallback finishedRecordigCallback) {
         this.finishedRecordingCallBack = finishedRecordigCallback;
         return this;
     }
 
-    public void startRecording() {
+    private void startRecording() {
         String audioFileName = UUID.randomUUID().toString() + ".3gp";
-        String absoluteFilename = AudioUtils.getAbsoluteFileName(audioFileName);
-        audioRecord = AudioUtils.createAudioRecord(realm, new Date(), audioFileName);
+        String absoluteFilename = audioRecordUtils.getAbsoluteFileName(audioFileName);
+        audioRecord = audioRecordUtils.createAudioRecord(new Date(), audioFileName);
         audioService.startRecording(absoluteFilename);
     }
 
     public void stopRecording() {
-            audioService.stopRecording();
+        audioService.stopRecording();
     }
 
 
@@ -93,15 +87,14 @@ public class AudioRecordViewModel extends AudioBaseViewModel implements  Finishe
                 .setCancelable(false)
                 .setPositiveButton(R.string.save, (dialogBox, id) -> {
                     String description = userInputDialogEditText.getText().toString();
-                    if (description != null) {
-                        AudioUtils.saveDescriptionWithAudio(realm, audioRecord, description);
-                        dialogBox.dismiss();
-                        finish();
-                    }
+                    audioRecordUtils.saveDescriptionWithAudio(audioRecord, description);
+                    dialogBox.dismiss();
+                    finish();
+
                 })
                 .setNegativeButton(R.string.cancel_delete_audio,
                         (dialogBox, id) -> {
-                           // deleteAudio();
+                            // deleteAudio();
                             dialogBox.dismiss();
                             finish();
                         });
@@ -112,7 +105,7 @@ public class AudioRecordViewModel extends AudioBaseViewModel implements  Finishe
 
     }
 
-    private void finish(){
+    private void finish() {
         audioService.stopRecording();
         finishedRecording();
     }

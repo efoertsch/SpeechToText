@@ -13,7 +13,7 @@ import android.widget.MediaController;
 import com.fisincorporated.speechtotext.R;
 import com.fisincorporated.speechtotext.audio.AudioService;
 import com.fisincorporated.speechtotext.audio.data.AudioRecord;
-import com.fisincorporated.speechtotext.audio.utils.AudioUtils;
+import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
 import com.fisincorporated.speechtotext.databinding.AudioPlaybackBinding;
 import com.fisincorporated.speechtotext.ui.AudioBaseViewModel;
 
@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import io.realm.Realm;
 
 public class AudioPlaybackViewModel extends AudioBaseViewModel implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener,  MediaController.MediaPlayerControl,
-        MediaPlayer.OnErrorListener {
+        MediaPlayer.OnErrorListener, AudioRecord.ChangeListener {
     private static final String TAG = AudioPlaybackViewModel.class.getSimpleName();
 
     private View bindingView;
@@ -47,11 +47,13 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements MediaP
 
     private Handler handler = new Handler();
 
+    private AudioRecordUtils audioRecordUtils;
+
     @Inject
-    public AudioPlaybackViewModel(Context context, AudioService audioService, Realm realm) {
+    public AudioPlaybackViewModel(Context context, AudioService audioService, AudioRecordUtils audioRecordUtils) {
         this.context = context;
         this.audioService = audioService;
-        this.realm = realm;
+        this.audioRecordUtils = audioRecordUtils;
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnPreparedListener(this);
         mediaPlayer.setOnCompletionListener(this);
@@ -61,9 +63,11 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements MediaP
 
     public void playAudio(long audioRecordId){
         if (audioRecordId != 0) {
-            audioRecord = getAudioRecord(audioRecordId);
+            audioRecord = audioRecordUtils.getAudioRecord(audioRecordId);
+            audioRecord.setChangeListener(this);
             if (audioRecord != null) {
                 viewDataBinding.setData(audioRecord);
+                viewDataBinding.setViewModel(this);
                 viewDataBinding.executePendingBindings();
                 startPlaying(audioRecord);
             }
@@ -73,19 +77,14 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements MediaP
     public AudioPlaybackViewModel setView(View view){
         bindingView = view.findViewById(R.id.audio_playback_layout);
         viewDataBinding = DataBindingUtil.bind(bindingView);
+
         return this;
 
     }
 
-
-    private AudioRecord getAudioRecord(long id) {
-            Realm realm = Realm.getDefaultInstance();
-            return realm.where(AudioRecord.class).equalTo(AudioRecord.FIELDS.id.name(),id).findFirst();
-    }
-
     private  void startPlaying(AudioRecord audioRecord) {
         try {
-            audioFile = AudioUtils.getAbsoluteFileName(audioRecord.getAudioFileName());
+            audioFile = audioRecordUtils.getAbsoluteFileName(audioRecord.getAudioFileName());
             mediaPlayer.reset();
             mediaPlayer.setDataSource(audioFile);
             mediaPlayer.prepare();
@@ -207,4 +206,12 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements MediaP
     }
 
 
+    @Override
+    public void onChange() {
+        viewDataBinding.audioPlaybackSaveBtn.setVisibility(View.VISIBLE);
+    }
+
+    public void updateAudioRecord(){
+        audioRecordUtils.updateAudioRecord(audioRecord);
+    }
 }

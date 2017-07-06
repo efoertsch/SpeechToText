@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.fisincorporated.speechtotext.application.AudioApplication;
 import com.fisincorporated.speechtotext.audio.AudioService;
+import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
 
 import javax.inject.Singleton;
 
@@ -20,8 +21,16 @@ public class ApplicationModule {
     @Provides
     @Singleton
     AudioService provideAudioService(){
+
         return new AudioService();
     }
+
+    @Provides
+    @Singleton
+    public AudioRecordUtils providesAudioRecordUtils(AudioApplication application) {
+        return new AudioRecordUtils(application);
+    }
+
 
 
 }

@@ -3,7 +3,7 @@ package com.fisincorporated.speechtotext.application;
 import android.app.Activity;
 import android.app.Application;
 
-import com.fisincorporated.speechtotext.audio.utils.AudioUtils;
+import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
 import com.fisincorporated.speechtotext.dagger.application.DaggerApplicationComponent;
 
 import javax.inject.Inject;
@@ -17,15 +17,14 @@ public class AudioApplication extends Application implements HasDispatchingActiv
     @Inject
     DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
 
+    @Inject AudioRecordUtils audioRecordsUtils;
 
     @Override
     public void onCreate() {
         super.onCreate();
         createDaggerInjections();
-        AudioUtils.setContext(this);
-        AudioUtils.configureRealm();
-        AudioUtils.listAudioFiles();
-        AudioUtils.createMissingAudioRecords();
+        audioRecordsUtils.listAudioFiles();
+        audioRecordsUtils.createMissingAudioRecords();
     }
 
     protected void createDaggerInjections() {

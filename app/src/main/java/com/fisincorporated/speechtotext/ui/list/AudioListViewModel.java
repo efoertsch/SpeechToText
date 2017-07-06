@@ -14,14 +14,13 @@ import com.fisincorporated.speechtotext.R;
 import com.fisincorporated.speechtotext.audio.DividerItemDecoration;
 import com.fisincorporated.speechtotext.audio.PlayAudioCallback;
 import com.fisincorporated.speechtotext.audio.data.AudioRecord;
+import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
 import com.fisincorporated.speechtotext.databinding.AudioListBinding;
 import com.fisincorporated.speechtotext.ui.AudioBaseViewModel;
 import com.fisincorporated.speechtotext.ui.playback.AudioPlaybackActivity;
 import com.fisincorporated.speechtotext.ui.record.AudioRecordActivity;
 
 import javax.inject.Inject;
-
-import io.realm.Realm;
 
 public class AudioListViewModel extends AudioBaseViewModel implements PlayAudioCallback  {
 
@@ -35,17 +34,16 @@ public class AudioListViewModel extends AudioBaseViewModel implements PlayAudioC
 
     private RecyclerView recyclerView;
 
-    private Realm realm;
-
     private Context context;
 
     private AudioListAdapter audioListAdapter;
 
+    private AudioRecordUtils audioRecordUtils;
+
     @Inject
-    public AudioListViewModel(Context context, AudioListAdapter audioListAdapter, Realm realm) {
+    public AudioListViewModel(Context context, AudioListAdapter audioListAdapter, AudioRecordUtils audioRecordUtils) {
         this.context = context;
         this.audioListAdapter = audioListAdapter;
-        this.realm = realm;
         audioListAdapter.setPlayAudioCallback(this);
     }
 
@@ -97,7 +95,7 @@ public class AudioListViewModel extends AudioBaseViewModel implements PlayAudioC
 
         @Override
         public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
-            deleteItemAsync(realm, viewHolder.getItemId());
+            audioRecordUtils.deleteItemAsync(realm, viewHolder.getItemId());
         }
 
         @Override
@@ -105,15 +103,6 @@ public class AudioListViewModel extends AudioBaseViewModel implements PlayAudioC
             return true;
         }
 
-    }
-
-    public static void deleteItemAsync(Realm realm, final long id) {
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                AudioRecord.delete(realm, id);
-            }
-        });
     }
 
 }
