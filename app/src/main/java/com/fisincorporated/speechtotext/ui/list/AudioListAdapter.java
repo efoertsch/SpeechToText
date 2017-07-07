@@ -1,4 +1,4 @@
-package com.fisincorporated.speechtotext.audio;
+package com.fisincorporated.speechtotext.ui.list;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -9,37 +9,22 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.fisincorporated.speechtotext.R;
-
-import java.util.HashSet;
-import java.util.Set;
+import com.fisincorporated.speechtotext.audio.PlayAudioCallback;
+import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 
 import javax.inject.Inject;
 
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;
 
-public class AudioRecordAdapter extends RealmRecyclerViewAdapter<AudioRecord, AudioRecordAdapter.MyViewHolder> {
+public class AudioListAdapter extends RealmRecyclerViewAdapter<AudioRecord, AudioListAdapter.MyViewHolder> {
 
-    private boolean inDeletionMode = false;
-    private Set<String> AudioRecordsToDelete = new HashSet<>();
-    private Context context;
+    private PlayAudioCallback playAudioCallback;
 
     @Inject
-    public AudioRecordAdapter(Context context, OrderedRealmCollection<AudioRecord> data) {
+    public AudioListAdapter(Context context, OrderedRealmCollection<AudioRecord> data) {
         super(context, data, true);
         setHasStableIds(true);
-    }
-
-    public void enableDeletionMode(boolean enabled) {
-        inDeletionMode = enabled;
-        if (!enabled) {
-            AudioRecordsToDelete.clear();
-        }
-        notifyDataSetChanged();
-    }
-
-    public Set<String> getAudioRecordsToDelete() {
-        return AudioRecordsToDelete;
     }
 
     @Override
@@ -51,25 +36,41 @@ public class AudioRecordAdapter extends RealmRecyclerViewAdapter<AudioRecord, Au
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        final AudioRecord obj = getItem(position);
-        holder.data = obj;
-        holder.title.setText(obj.getRecordDateTime());
+        final AudioRecord audioRecord = getItem(position);
+        holder.data = audioRecord;
+        holder.title.setText((audioRecord.getDescription()));
+        holder.recordDate.setText(audioRecord.getRecordDateTime());
+        if (playAudioCallback != null) {
+            holder.playAudioButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    playAudioCallback.playAudioRecord(audioRecord);
+                }
+            });
+        }
     }
 
     @Override
     public long getItemId(int index) {
-        return getItem(index).getMillisecId();
+        return getItem(index).getId();
+    }
+
+    public void setPlayAudioCallback(PlayAudioCallback playAudioCallback) {
+        this.playAudioCallback = playAudioCallback;
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView title;
+        TextView recordDate;
         ImageButton playAudioButton;
         public AudioRecord data;
 
         MyViewHolder(View view) {
             super(view);
             title = (TextView) view.findViewById(R.id.audio_record_description);
+            recordDate = (TextView) view.findViewById(R.id.audio_record_date);
             playAudioButton = (ImageButton) view.findViewById(R.id.audio_record_play_image);
+
         }
     }
 }
