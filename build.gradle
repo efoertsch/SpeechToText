@@ -15,6 +15,7 @@ buildscript {
 
         // Retrolambda
         classpath 'me.tatarka:gradle-retrolambda:3.2.0'
+        classpath 'com.google.gms:google-services:3.0.0'
     }
 }
 

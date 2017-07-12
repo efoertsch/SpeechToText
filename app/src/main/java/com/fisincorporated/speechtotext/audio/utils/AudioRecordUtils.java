@@ -21,9 +21,13 @@ public class AudioRecordUtils {
 
     private static final String TAG = AudioRecordUtils.class.getSimpleName();
 
+    private static final String fileSeparator = "/";
+
     private Context context;
 
     private Realm realm;
+
+
 
     @Inject
     public AudioRecordUtils(Context context) {
@@ -51,16 +55,19 @@ public class AudioRecordUtils {
         return realm.where(AudioRecord.class).notEqualTo(AudioRecord.FIELDS.id.name(), 0).findAllSorted(AudioRecord.FIELDS.audioFileName.name());
     }
 
+    public String getAudioDirectoryPath(){
+        return context.getFilesDir() + fileSeparator;
+    }
+
     public String getAbsoluteFileName(String filename) {
-        return context.getFilesDir() + "/" + filename;
+        return context.getFilesDir() + fileSeparator + filename;
     }
 
     public AudioRecord createAudioRecord(final Date currentDate, final String audioFileName) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                AudioRecord audioRecord = realm.createObject(AudioRecord.class);
-                audioRecord.setId(currentDate.getTime());
+                AudioRecord audioRecord = realm.createObject(AudioRecord.class, currentDate.getTime());
                 audioRecord.setAudioFileName(audioFileName);
                 realm.insertOrUpdate(audioRecord);
             }
@@ -153,7 +160,7 @@ public class AudioRecordUtils {
             }, new Realm.Transaction.OnSuccess() {
                 @Override
                 public void onSuccess() {
-                    //
+                    Log.e(TAG, "Success: audioRecord updated");
                 }
             }, new Realm.Transaction.OnError() {
                 @Override
@@ -165,7 +172,7 @@ public class AudioRecordUtils {
         }
     }
 
-    public void deleteItemAsync(Realm realm, final long id) {
+    public void deleteItemAsync(final long id) {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {

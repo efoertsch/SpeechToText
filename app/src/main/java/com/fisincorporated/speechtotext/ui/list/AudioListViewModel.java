@@ -44,6 +44,7 @@ public class AudioListViewModel extends AudioBaseViewModel implements PlayAudioC
     public AudioListViewModel(Context context, AudioListAdapter audioListAdapter, AudioRecordUtils audioRecordUtils) {
         this.context = context;
         this.audioListAdapter = audioListAdapter;
+        this.audioRecordUtils = audioRecordUtils;
         audioListAdapter.setPlayAudioCallback(this);
     }
 
@@ -95,7 +96,7 @@ public class AudioListViewModel extends AudioBaseViewModel implements PlayAudioC
 
         @Override
         public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
-            audioRecordUtils.deleteItemAsync(realm, viewHolder.getItemId());
+            audioRecordUtils.deleteItemAsync(viewHolder.getItemId());
         }
 
         @Override

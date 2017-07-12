@@ -3,28 +3,27 @@ package com.fisincorporated.speechtotext.ui.playback;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
-import android.media.MediaPlayer;
-import android.os.Handler;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.MediaController;
 
 import com.fisincorporated.speechtotext.R;
 import com.fisincorporated.speechtotext.audio.AudioService;
 import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
+import com.fisincorporated.speechtotext.audio.utils.SpeechToTextConversionData;
+import com.fisincorporated.speechtotext.audio.utils.SpeechToTextService;
 import com.fisincorporated.speechtotext.databinding.AudioPlaybackBinding;
 import com.fisincorporated.speechtotext.ui.AudioBaseViewModel;
-
-import java.io.IOException;
+import com.fisincorporated.speechtotext.ui.MediaPlayerAndController;
 
 import javax.inject.Inject;
 
-import io.realm.Realm;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 
-public class AudioPlaybackViewModel extends AudioBaseViewModel implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener,  MediaController.MediaPlayerControl,
-        MediaPlayer.OnErrorListener, AudioRecord.ChangeListener {
+public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioRecord.ChangeListener {
     private static final String TAG = AudioPlaybackViewModel.class.getSimpleName();
 
     private View bindingView;
@@ -33,185 +32,106 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements MediaP
 
     private Context context;
 
-    private Realm realm;
-
     private AudioService audioService;
 
     private AudioRecord audioRecord;
 
-    private MediaPlayer mediaPlayer;
-
-    private MediaController mediaController;
-
     private String audioFile;
-
-    private Handler handler = new Handler();
 
     private AudioRecordUtils audioRecordUtils;
 
+    private SpeechToTextService speechToTextService;
+
+    private MediaPlayerAndController mediaPlayerAndController;
+
+    private final CompositeDisposable disposables = new CompositeDisposable();
+
     @Inject
-    public AudioPlaybackViewModel(Context context, AudioService audioService, AudioRecordUtils audioRecordUtils) {
+    public AudioPlaybackViewModel(Context context, AudioService audioService, AudioRecordUtils audioRecordUtils, SpeechToTextService speechToTextService) {
         this.context = context;
         this.audioService = audioService;
         this.audioRecordUtils = audioRecordUtils;
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setOnPreparedListener(this);
-        mediaPlayer.setOnCompletionListener(this);
-
-        mediaController = new MediaController(context);
+        this.speechToTextService = speechToTextService;
     }
 
-    public void playAudio(long audioRecordId){
-        if (audioRecordId != 0) {
-            audioRecord = audioRecordUtils.getAudioRecord(audioRecordId);
-            audioRecord.setChangeListener(this);
-            if (audioRecord != null) {
-                viewDataBinding.setData(audioRecord);
-                viewDataBinding.setViewModel(this);
-                viewDataBinding.executePendingBindings();
-                startPlaying(audioRecord);
-            }
-        }
-    }
-
-    public AudioPlaybackViewModel setView(View view){
+    public AudioPlaybackViewModel setView(View view) {
         bindingView = view.findViewById(R.id.audio_playback_layout);
         viewDataBinding = DataBindingUtil.bind(bindingView);
-
+        mediaPlayerAndController = viewDataBinding.audioPlaybackMediaController;
         return this;
-
     }
 
-    private  void startPlaying(AudioRecord audioRecord) {
-        try {
+    public void playAudio(long audioRecordId) {
+        if (audioRecordId != 0) {
+            audioRecord = audioRecordUtils.getAudioRecord(audioRecordId);
             audioFile = audioRecordUtils.getAbsoluteFileName(audioRecord.getAudioFileName());
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(audioFile);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-        } catch (IOException e) {
-            Log.e(TAG, "Could not open file " + audioFile + " for playback.", e);
+            viewDataBinding.setData(audioRecord);
+            viewDataBinding.setViewModel(this);
+            viewDataBinding.executePendingBindings();
+            // TODO send filename to view to play
+            mediaPlayerAndController.play(audioFile);
+            startSpeechToTextTranslation(audioRecord.getAudioFileName());
         }
-    }
-
-
-    protected void stopPlaying() {
-        if (mediaController.isShowing()) {
-            mediaController.hide();
-        }
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-        }
-    }
-
-
-    public boolean onTouchEvent(MotionEvent event) {
-        // keep mediaController on screen
-        mediaController.show(0);
-        return false;
-    }
-
-    //--MediaPlayerControl methods----------------------------------------------------
-    public void start() {
-        mediaController.show(0);
-        mediaPlayer.start();
-    }
-
-    public void pause() {
-        mediaPlayer.pause();
-    }
-
-    public int getDuration() {
-        return mediaPlayer.getDuration();
-    }
-
-    public int getCurrentPosition() {
-        return mediaPlayer.getCurrentPosition();
-    }
-
-    public void seekTo(int i) {
-        mediaPlayer.seekTo(i);
-    }
-
-    public boolean isPlaying() {
-        return mediaPlayer.isPlaying();
-    }
-
-    public int getBufferPercentage() {
-        return 0;
-    }
-
-    public boolean canPause() {
-        return true;
-    }
-
-    public boolean canSeekBackward() {
-        return true;
-    }
-
-    public boolean canSeekForward() {
-        return true;
     }
 
     @Override
-    public int getAudioSessionId() {
-        return 0;
+    public void onPause() {
+        super.onPause();
+        mediaPlayerAndController.pause();
     }
-    //--------------------------------------------------------------------------------
 
-    public void onPrepared(MediaPlayer mediaPlayer) {
-        Log.d(TAG, "onPrepared");
-        mediaController.setMediaPlayer(this);
-        mediaController.setAnchorView(viewDataBinding.audioPlaybackMediaController);
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mediaPlayerAndController.release();
+        disposables.dispose();
+    }
 
-        handler.post(new Runnable() {
-            public void run() {
-                mediaController.setEnabled(true);
-                mediaController.show(0);
+
+    private void startSpeechToTextTranslation(String filename) {
+        //return speechToTextService.startSpeechToTextTranslation(audioRecordUtils.getAbsoluteFileName(filename), filename);
+
+        SpeechToTextConversionData speechToTextConversionData = new SpeechToTextConversionData(audioRecordUtils.getAudioDirectoryPath(), filename);
+        Observable<SpeechToTextConversionData> observable = speechToTextService.getSpeechToTextObservable(speechToTextConversionData);
+
+        DisposableObserver<SpeechToTextConversionData> observer = new DisposableObserver<SpeechToTextConversionData>() {
+
+            @Override
+            public void onError(Throwable e) {
+                System.out.println(e.toString());
             }
-        });
-    }
 
-    @Override
-    public boolean onError(MediaPlayer mp, int what, int extra) {
-        StringBuilder sb = new StringBuilder();
-        if (extra == MediaPlayer.MEDIA_ERROR_TIMED_OUT) {
-            sb.append(context.getString(R.string.media_player_error_load_timeout));
-        } else if (what == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
-            sb.append(context.getString(R.string.media_player_error_mserver_unaccessible));
-        } else {
-            sb.append( context.getString(R.string.media_player_error_unknown_error));
-        }
-        switch (what) {
-            case MediaPlayer.MEDIA_ERROR_IO:
-                sb.append(context.getString(R.string.media_player_error_io_error));
-                break;
-            case MediaPlayer.MEDIA_ERROR_MALFORMED:
-                sb.append( context.getString(R.string.media_player_error_malformed_bitstream));
-                break;
-            case MediaPlayer.MEDIA_ERROR_UNSUPPORTED:
-                sb.append(context.getString(R.string.media_player_error_unsupported_media));
-                break;
-            case MediaPlayer.MEDIA_ERROR_TIMED_OUT:
-                sb.append(context.getString(R.string.media_player_error_timed_out));
-        }
-        Log.d(TAG, sb.toString());
-        mediaPlayer.reset();
-        return true;
-    }
+            @Override
+            public void onComplete() {
+                System.out.println("onCompleted");
+            }
 
-    @Override
-    public void onCompletion(MediaPlayer mp) {
+
+            @Override
+            public void onNext(SpeechToTextConversionData speechToTextConversionData) {
+                System.out.println("onNext:" + speechToTextConversionData.toString());
+            }
+        };
+
+     disposables.add(observable.observeOn(AndroidSchedulers.mainThread()).
+              subscribeOn(Schedulers.io()).subscribeWith(observer));
+
+
     }
 
 
     @Override
     public void onChange() {
+
         viewDataBinding.audioPlaybackSaveBtn.setVisibility(View.VISIBLE);
     }
 
-    public void updateAudioRecord(){
+    // Called via xml onClick
+    public void updateAudioRecord() {
         audioRecordUtils.updateAudioRecord(audioRecord);
+    }
+
+    public void stopPlaying() {
+        mediaPlayerAndController.pause();
     }
 }

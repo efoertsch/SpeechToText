@@ -83,6 +83,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/margin_standard"
                         android:scrollbars="horizontal"
+                        android:inputType="textMultiLine"
                         android:text="@={data.speachToTextTranslation}"
                         android:textSize="16sp"
                         tools:text="Four score and seven years ago our fathers brought forth, upon this continent, a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived, and so dedicated, can long endure."
@@ -118,17 +119,11 @@
 
             </LinearLayout>
 
-            <RelativeLayout
-                android:id="@+id/audio_playback_media_controller"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/margin_standard"
                 android:layout_alignParentBottom="true"
-                android:layout_marginStart="@dimen/margin_standard"
-                android:layout_above="@+id/audio_playback_save_btn"
-               >
-
-            </RelativeLayout>
+                android:orientation="vertical">
 
             <Button
                 android:id="@+id/audio_playback_save_btn"
@@ -138,6 +133,17 @@
                 android:layout_alignParentBottom="true"
                 android:onClick="@{() -> viewModel.updateAudioRecord()}"/>
 
+
+            <com.fisincorporated.speechtotext.ui.MediaPlayerAndController
+                android:id="@+id/audio_playback_media_controller"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_standard"
+                android:layout_below="@+id/audio_playback_save_btn"
+                android:layout_marginStart="@dimen/margin_standard">
+
+            </com.fisincorporated.speechtotext.ui.MediaPlayerAndController>
+            </LinearLayout>
 
         </RelativeLayout>
 
