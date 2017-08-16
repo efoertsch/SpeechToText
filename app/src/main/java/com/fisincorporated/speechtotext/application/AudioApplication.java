@@ -2,6 +2,8 @@ package com.fisincorporated.speechtotext.application;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
@@ -22,7 +24,8 @@ public class AudioApplication extends Application implements HasDispatchingActiv
     @Inject
     DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
 
-    @Inject AudioRecordUtils audioRecordsUtils;
+    @Inject
+    AudioRecordUtils audioRecordsUtils;
 
     private StorageReference storageRef;
 
@@ -32,8 +35,30 @@ public class AudioApplication extends Application implements HasDispatchingActiv
         createDaggerInjections();
         audioRecordsUtils.listAudioFiles();
         audioRecordsUtils.createMissingAudioRecords();
+        // info obtained from google-services.json in src directory
         storageRef = FirebaseStorage.getInstance().getReference();
         loadAudioConverter();
+        displayPackageAndSigniture();
+    }
+
+    private void displayPackageAndSigniture() {
+        String packageName = getPackageName();
+        Log.d(TAG, "Package name:" + getPackageName());
+        // String sig = getSignature(getPackageManager(), packageName);
+        PackageInfo packageInfo = null;
+        try {
+            packageInfo = getPackageManager().getPackageInfo(packageName, PackageManager.GET_SIGNATURES);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (packageInfo == null
+                || packageInfo.signatures == null
+                || packageInfo.signatures.length == 0
+                || packageInfo.signatures[0] == null) {
+          //  return null;
+        }
+        //return signatureDigest(packageInfo.signatures[0]);
+        Log.d(TAG, "Package signature:" + packageInfo.signatures[0]);
     }
 
     protected void createDaggerInjections() {
@@ -62,6 +87,32 @@ public class AudioApplication extends Application implements HasDispatchingActiv
             }
         });
     }
+
+//    public static String getSignature(@NonNull PackageManager pm, @NonNull String packageName) {
+//               try {
+//                        PackageInfo packageInfo = pm.getPackageInfo(packageName, PackageManager.GET_SIGNATURES);
+//                         if (packageInfo == null
+//                                       || packageInfo.signatures == null
+//                                         || packageInfo.signatures.length == 0
+//                                        || packageInfo.signatures[0] == null) {
+//                                return null;
+//                            }
+//                        return signatureDigest(packageInfo.signatures[0]);
+//                    } catch (PackageManager.NameNotFoundException e) {
+//                        return null;
+//                   }
+//    }
+
+//    private static String signatureDigest(Signature sig) {
+//        byte[] signature = sig.toByteArray();
+//        try {
+//            MessageDigest md = MessageDigest.getInstance("SHA1");
+//            byte[] digest = md.digest(signature);
+//            return BaseEncoding.base16().lowerCase().encode(digest);
+//        } catch (NoSuchAlgorithmException e) {
+//            return null;
+//        }
+//}
 
 
 }

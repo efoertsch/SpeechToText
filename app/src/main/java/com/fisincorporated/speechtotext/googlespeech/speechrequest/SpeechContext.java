@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+// See https://cloud.google.com/speech/reference/rest/v1/RecognitionConfig#SpeechContext
 public class SpeechContext {@SerializedName("phrases")
 @Expose
 private List<String> phrases = null;

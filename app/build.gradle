@@ -90,6 +90,9 @@ dependencies {
     compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.1'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
 
+    // For debugging/com.google.common.io.BaseEncoding
+     //compile 'com.google.guava:guava:22.0-android'
+
     // For Dagger2
     compile "com.google.dagger:dagger:$DAGGER_VERSION"
     compile "com.google.dagger:dagger-android:$DAGGER_VERSION"

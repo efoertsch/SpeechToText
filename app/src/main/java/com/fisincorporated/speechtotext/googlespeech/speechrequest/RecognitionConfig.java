@@ -6,7 +6,20 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+// See https://cloud.google.com/speech/reference/rest/v1/RecognitionConfig
 public class RecognitionConfig {
+
+    // see https://cloud.google.com/speech/reference/rest/v1/RecognitionConfig#AudioEncoding
+    public enum AudioEncoding {
+        ENCODING_UNSPECIFIED,
+        LINEAR16,
+        FLAC,
+        MULAW,
+        AMR,
+        AMR_WB,
+        OGG_OPUS,
+        SPEEX_WITH_HEADER_BYTE;
+    }
     @SerializedName("encoding")
     @Expose
     private String encoding;
