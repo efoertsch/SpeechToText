@@ -65,6 +65,12 @@
 
                 </LinearLayout>
 
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/translate"
+                    android:onClick="@{() -> viewModel.translateToText()}"/>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -84,7 +90,7 @@
                         android:layout_marginStart="@dimen/margin_standard"
                         android:scrollbars="horizontal"
                         android:inputType="textMultiLine"
-                        android:text="@={data.speachToTextTranslation}"
+                        android:text="@={data.speechToTextTranslation}"
                         android:textSize="16sp"
                         tools:text="Four score and seven years ago our fathers brought forth, upon this continent, a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived, and so dedicated, can long endure."
                         />

@@ -17,6 +17,8 @@ import javax.inject.Inject;
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;
 
+// TODO
+// Update code to use Realm with Databinding - https://medium.com/@Zhuinden/realm-1-2-0-android-data-binding-1dc06822287f
 public class AudioListAdapter extends RealmRecyclerViewAdapter<AudioRecord, AudioListAdapter.MyViewHolder> {
 
     private PlayAudioCallback playAudioCallback;
@@ -48,6 +50,18 @@ public class AudioListAdapter extends RealmRecyclerViewAdapter<AudioRecord, Audi
                 }
             });
         }
+        if (holder.speechToTextView != null &&
+                (audioRecord.getSpeechToTextTranslation() == null
+         || audioRecord.getSpeechToTextTranslation().isEmpty())
+                && audioRecord.getSpeechToTextStatus() <=0) {
+            holder.speechToTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+
+                }
+            });
+        }
     }
 
     @Override
@@ -63,6 +77,8 @@ public class AudioListAdapter extends RealmRecyclerViewAdapter<AudioRecord, Audi
         TextView title;
         TextView recordDate;
         ImageButton playAudioButton;
+        View  speechToTextView;
+
         public AudioRecord data;
 
         MyViewHolder(View view) {
@@ -70,6 +86,7 @@ public class AudioListAdapter extends RealmRecyclerViewAdapter<AudioRecord, Audi
             title = (TextView) view.findViewById(R.id.audio_record_description);
             recordDate = (TextView) view.findViewById(R.id.audio_record_date);
             playAudioButton = (ImageButton) view.findViewById(R.id.audio_record_play_image);
+            speechToTextView = view.findViewById(R.id.audio_record_speech_to_text_view);
 
         }
     }

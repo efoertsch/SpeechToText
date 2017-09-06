@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import io.realm.OrderedRealmCollection;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.Sort;
 
 public class AudioRecordUtils {
 
@@ -35,7 +36,7 @@ public class AudioRecordUtils {
         Realm.init(context);
         RealmConfiguration realmConfig = new RealmConfiguration.Builder()
                 .name("audio.files")
-                .schemaVersion(1)
+                .schemaVersion(2)
                 .migration(new AudioRecordMigration())
                 .initialData(new Realm.Transaction() {
                     @Override
@@ -52,7 +53,7 @@ public class AudioRecordUtils {
     }
 
     public OrderedRealmCollection<AudioRecord> getOrderedRealmCollection() {
-        return realm.where(AudioRecord.class).notEqualTo(AudioRecord.FIELDS.id.name(), 0).findAllSorted(AudioRecord.FIELDS.audioFileName.name());
+        return realm.where(AudioRecord.class).notEqualTo(AudioRecord.FIELDS.id.name(), 0).findAllSorted(AudioRecord.FIELDS.id.name(), Sort.DESCENDING);
     }
 
     public String getAudioDirectoryPath(){
@@ -69,6 +70,7 @@ public class AudioRecordUtils {
             public void execute(Realm realm) {
                 AudioRecord audioRecord = realm.createObject(AudioRecord.class, currentDate.getTime());
                 audioRecord.setAudioFileName(audioFileName);
+                audioRecord.setRecordDateTime(currentDate.toString());
                 realm.insertOrUpdate(audioRecord);
             }
         });
@@ -131,13 +133,20 @@ public class AudioRecordUtils {
                 for (AudioRecord audioRecord : list) {
                     if (file.getName().equals(audioRecord.getAudioFileName())) {
                         recordExists = true;
+                        if (audioRecord.getRecordDateTime().isEmpty()) {
+                            AudioRecord clonedAudioRecord = realm.copyFromRealm(audioRecord);
+                            clonedAudioRecord.setRecordDateTime(new Date(file.lastModified()).toString());
+                            updateAudioRecord(clonedAudioRecord);
+                        }
                         break;
                     }
                 }
                 if (!recordExists) {
-                    createAudioRecord(new Date(), file.getName());
+                    createAudioRecord(new Date(file.lastModified()), file.getName());
                     Log.d(TAG, "created audio record for " + file.getName());
+                    break;
                 }
+
             }
         }
 

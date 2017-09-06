@@ -2,8 +2,10 @@ package com.fisincorporated.speechtotext.audio.utils;
 
 
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class SpeechToTextConversionData {
+public class SpeechToTextConversionData implements Parcelable {
 
     private String deviceAbsolutePathToAudioFile = "";
 
@@ -125,4 +127,47 @@ public class SpeechToTextConversionData {
                 + "\n " + (exception == null ? "" : exception.toString());
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.deviceAbsolutePathToAudioFile);
+        dest.writeString(this.audio3gpFileName);
+        dest.writeString(this.audioFlacFileName);
+        dest.writeByte(this.flacConversionSuccess ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.signinToFirebaseSuccess ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.uploadToGcsSuccess ? (byte) 1 : (byte) 0);
+        dest.writeParcelable(this.gcsAudioFileName, flags);
+        dest.writeByte(this.audioToTextSuccess ? (byte) 1 : (byte) 0);
+        dest.writeString(this.audioText);
+        dest.writeSerializable(this.exception);
+    }
+
+    protected SpeechToTextConversionData(Parcel in) {
+        this.deviceAbsolutePathToAudioFile = in.readString();
+        this.audio3gpFileName = in.readString();
+        this.audioFlacFileName = in.readString();
+        this.flacConversionSuccess = in.readByte() != 0;
+        this.signinToFirebaseSuccess = in.readByte() != 0;
+        this.uploadToGcsSuccess = in.readByte() != 0;
+        this.gcsAudioFileName = in.readParcelable(Uri.class.getClassLoader());
+        this.audioToTextSuccess = in.readByte() != 0;
+        this.audioText = in.readString();
+        this.exception = (Exception) in.readSerializable();
+    }
+
+    public static final Creator<SpeechToTextConversionData> CREATOR = new Creator<SpeechToTextConversionData>() {
+        @Override
+        public SpeechToTextConversionData createFromParcel(Parcel source) {
+            return new SpeechToTextConversionData(source);
+        }
+
+        @Override
+        public SpeechToTextConversionData[] newArray(int size) {
+            return new SpeechToTextConversionData[size];
+        }
+    };
 }

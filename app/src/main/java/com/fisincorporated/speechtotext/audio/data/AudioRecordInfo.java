@@ -10,8 +10,12 @@ public interface AudioRecordInfo {
 
     void setDescription(String description);
 
-    String getSpeachToTextTranslation();
+    String getSpeechToTextTranslation();
 
-    void setSpeachToTextTranslation(String speachToTextTranslation);
+    void setSpeechToTextTranslation(String speechToTextTranslation);
+
+    int getSpeechToTextStatus();
+
+    void setSpeechToTextStatus(int speechToTextStatus);
 
 }

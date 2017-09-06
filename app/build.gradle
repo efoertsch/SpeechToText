@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 //Adding Realm - plugin defined in project level build.gradle
 apply plugin: 'realm-android'
-
+// Retrolamdba of course
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
@@ -55,11 +55,14 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     final SUPPORT_LIBRARY_VERSION = '25.3.1'
+    final CONSTRAINT_LAYOUT_VERSION = '1.0.2'
     final DAGGER_VERSION = '2.10'
     final JSR250_VERSION = '1.0'
     final ESPRESSO_CORE_VERSION = '2.2.2'
     final JUNIT4_VERSION = '4.12'
     final RETROFIT_VERSION = '2.3.0'
+    final FIREBASE_VERSION = '11.2.0'  //'10.0.1'
+    final GOOGLE_API_CLIENT = '1.22.0'
 
     // Android compat/support libraries
     compile "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
@@ -68,13 +71,17 @@ dependencies {
     compile "com.android.support:support-v4:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:support-annotations:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:support-v4:$SUPPORT_LIBRARY_VERSION"
+    compile "com.android.support.constraint:constraint-layout:$CONSTRAINT_LAYOUT_VERSION"
 
     // See project level build.gradle for Realm plugin
     // Realm recycler view
 
+    //Google Signin
+    compile 'com.google.android.gms:play-services-auth:11.2.0'
+
     // Speech To Text
     // Using API calls instead
-    //compile 'com.google.cloud:google-cloud-speech:0.17.1-alpha'
+    compile 'com.google.cloud:google-cloud-speech:0.22.0-alpha'
 
     // Convert to convert 3gp audio to flac - https://github.com/adrielcafe/AndroidAudioConverter
     compile 'com.github.adrielcafe:AndroidAudioConverter:0.0.8'
@@ -102,19 +109,30 @@ dependencies {
     provided "javax.annotation:jsr250-api:$JSR250_VERSION"
 
     // For Realm recyclerView adapter
-    compile 'io.realm:android-adapters:1.4.0'
+    compile  'io.realm:android-adapters:1.4.0'
 
-    // Upload/download files to google cloud storage
-    compile 'com.google.firebase:firebase-storage:10.0.1'
-    compile 'com.google.firebase:firebase-auth:10.0.1'
+    // Authenticate using Google sign-in
+    compile "com.google.android.gms:play-services-auth:$FIREBASE_VERSION"
+    compile "com.google.firebase:firebase-auth:$FIREBASE_VERSION"
+    // Upload/download files to google/firebase cloud storage
+    compile "com.google.firebase:firebase-storage:$FIREBASE_VERSION"
+    // Google Api Client library and Android extension
+    compile "com.google.api-client:google-api-client:$GOOGLE_API_CLIENT"
+    compile "com.google.api-client:google-api-client-android:$GOOGLE_API_CLIENT"
+
+
+    // OAuth2
+    // com.google.gms:google-services:3.1.0 in project build.gradle conflicts with play services 11.0.4
+    //compile 'com.google.android.gms:play-services-auth:11.0.4'
+    //compile 'com.google.android.gms:play-services:9.0.0'
 
     androidTestCompile("com.android.support.test.espresso:espresso-core:$ESPRESSO_CORE_VERSION", {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
     })
 
-
     testCompile "junit:junit:$JUNIT4_VERSION"
+
 
 
 }

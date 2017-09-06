@@ -26,15 +26,27 @@
         </activity>
         <activity
             android:name=".ui.record.AudioRecordActivity"
-            android:screenOrientation="portrait"
-           >
+            android:screenOrientation="portrait">
         </activity>
 
         <activity
             android:name=".ui.playback.AudioPlaybackActivity"
-            android:screenOrientation="portrait"
-            >
+            android:screenOrientation="portrait">
         </activity>
+
+        <activity
+            android:name=".ui.signin.SignInActivity"
+            android:screenOrientation="portrait"
+            android:exported="true">
+        </activity>
+
+        <service
+            android:name=".translation.XlatSchedulerService"
+            android:label="For audio to text translation"
+            android:permission="android.permission.BIND_JOB_SERVICE" >
+
+        </service>
+
     </application>
 
 </manifest>

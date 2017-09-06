@@ -15,6 +15,8 @@ import io.realm.annotations.Required;
 
 public class AudioRecord extends RealmObject implements AudioRecordInfo {
 
+    public static final String AUDIO_RECORD = "AudioRecord";
+
     private static final SimpleDateFormat recordDate = new SimpleDateFormat("yyyy-MM-dd:HH:mm", Locale.getDefault());
 
     public interface ChangeListener {
@@ -26,6 +28,26 @@ public class AudioRecord extends RealmObject implements AudioRecordInfo {
         recordDataTime,
         audioFileName,
         description;
+    }
+
+    public enum AUDIO_TO_TEXT_STATUS {
+        ERROR(-1),
+        NOT_STARTED(0),
+        RUNNING(1),
+        FINISHED(2);
+        private final int value;
+
+        private AUDIO_TO_TEXT_STATUS(final int value) {
+            this.value = value;
+        }
+        public static AUDIO_TO_TEXT_STATUS fromValue(int value)
+                throws IllegalArgumentException {
+            try {
+                return AUDIO_TO_TEXT_STATUS.values()[value];
+            } catch(ArrayIndexOutOfBoundsException e) {
+                throw new IllegalArgumentException("Unknown enum value :"+ value);
+            }
+        }
     }
 
     @PrimaryKey
@@ -40,7 +62,12 @@ public class AudioRecord extends RealmObject implements AudioRecordInfo {
 
     private String description;
 
-    private String speachToTextTranslation;
+    //TODO change name
+    private String speechToTextTranslation;
+
+    private int speechToTextStatus = 0;
+
+    private int xlatJobNumber = 0;
 
     @Ignore
     private boolean changed;
@@ -103,12 +130,12 @@ public class AudioRecord extends RealmObject implements AudioRecordInfo {
         noteRecordChanged();
     }
 
-    public String getSpeachToTextTranslation() {
-        return speachToTextTranslation;
+    public String getSpeechToTextTranslation() {
+        return speechToTextTranslation;
     }
 
-    public void setSpeachToTextTranslation(String speachToTextTranslation) {
-        this.speachToTextTranslation = speachToTextTranslation;
+    public void setSpeechToTextTranslation(String speechToTextTranslation) {
+        this.speechToTextTranslation = speechToTextTranslation;
         noteRecordChanged();
     }
 
@@ -119,8 +146,27 @@ public class AudioRecord extends RealmObject implements AudioRecordInfo {
         }
     }
 
+    public void setChanged(boolean changed){
+        this.changed = changed;
+    }
+
     public boolean isChanged() {
         return changed;
     }
 
+    public int getSpeechToTextStatus() {
+        return speechToTextStatus;
+    }
+
+    public void setSpeechToTextStatus(int speechToTextStatus) {
+        this.speechToTextStatus = speechToTextStatus;
+    }
+
+    public int getXlatJobNumber() {
+        return xlatJobNumber;
+    }
+
+    public void setXlatJobNumber(int xlatJobNumber) {
+        this.xlatJobNumber = xlatJobNumber;
+    }
 }

@@ -11,7 +11,8 @@
 gradle/
 gradlew
 gradlew.bat
+debug/
+release/
 
-!/google-services.json
-/src/main/res/raw/client_secret_oauth2.json
-/src/main/res/raw/credential.json
+google-services.json
+

@@ -35,4 +35,13 @@
     <dimen name="list_single_line_height">48dp</dimen>
     <dimen name="list_single_line_side_margin">16dp</dimen>
 
+    <!-- Firebase -->
+    <dimen name="g_top_margin">100dp</dimen>
+
+    <!-- Google/Firebase signon -->
+    <dimen name="icon_top_margin">24dp</dimen>
+    <dimen name="icon_bottom_margin">24dp</dimen>
+    <dimen name="title_bottom_margin">16dp</dimen>
+    <dimen name="field_width_standard">160dp</dimen>
+
 </resources>

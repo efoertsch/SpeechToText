@@ -4,17 +4,27 @@ package com.fisincorporated.speechtotext.audio.utils;
 
 import android.app.Activity;
 import android.net.Uri;
-import android.support.annotation.NonNull;
+import android.system.Os;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.api.gax.rpc.OperationFuture;
+import com.google.cloud.speech.v1.LongRunningRecognizeMetadata;
+import com.google.cloud.speech.v1.LongRunningRecognizeResponse;
+import com.google.cloud.speech.v1.RecognitionAudio;
+import com.google.cloud.speech.v1.RecognitionConfig;
+import com.google.cloud.speech.v1.SpeechClient;
+import com.google.cloud.speech.v1.SpeechRecognitionAlternative;
+import com.google.cloud.speech.v1.SpeechRecognitionResult;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.longrunning.Operation;
 
 import java.io.File;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -24,6 +34,8 @@ import cafe.adriel.androidaudioconverter.model.AudioFormat;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
+
 
 //TODO - Cleanup
 public class SpeechToTextService {
@@ -31,6 +43,8 @@ public class SpeechToTextService {
     private static final String TAG = SpeechToTextService.class.getSimpleName();
 
     private StorageReference storageRef;
+
+    private FirebaseAuth firebaseAuth;
 
     private Activity activity;
 
@@ -66,7 +80,7 @@ public class SpeechToTextService {
                     public void onSuccess(File convertedFile) {
                         Log.d(TAG, "Converted:" + speechToTextConversionData.getAudio3gpFileName() + " to " + convertedFile);
                         speechToTextConversionData.setAudioFlacFileName(convertedFile.getName());
-                        Log.d(TAG, " Conversion status " + speechToTextConversionData.toString());
+                        Log.d(TAG, "Conversion status " + speechToTextConversionData.toString());
                         //emitter.onNext(speechToTextConversionData);
                         emitter.onComplete();
                     }
@@ -96,30 +110,7 @@ public class SpeechToTextService {
     }
 
 
-    public void convert3gpToFlac(final String absolute3GpFileName) {
-        File inputFile = new File(absolute3GpFileName);
-        IConvertCallback callback = new IConvertCallback() {
-            @Override
-            public void onSuccess(File convertedFile) {
-                Log.d(TAG, "Converted:" + absolute3GpFileName + " to " + convertedFile);
 
-            }
-
-            @Override
-            public void onFailure(Exception error) {
-                Log.d(TAG, "Error converting:" + absolute3GpFileName + " :" + error.toString());
-            }
-        };
-        AndroidAudioConverter.with(activity)
-                // Your current audio file
-                .setFile(inputFile)
-                // Your desired audio format
-                .setFormat(AudioFormat.FLAC)
-                // An callback to know when conversion is finished
-                .setCallback(callback)
-                // Start conversion
-                .convert();
-    }
 
     public Observable<SpeechToTextConversionData> signonToFirebaseObservable(SpeechToTextConversionData speechToTextConversionData) {
         Observable<SpeechToTextConversionData> observable = Observable.create(new ObservableOnSubscribe<SpeechToTextConversionData>() {
@@ -128,7 +119,7 @@ public class SpeechToTextService {
                 Log.d(TAG, " signonToFirebaseObservable. uploadFlacFileToFirebaseObservable. Current thread:" + Thread.currentThread());
                 // TODO - Remove anonymous sign in
                 // Sign in anonymously. Authentication is required to read or write from Firebase Storage.
-                // firebaseAuth.signInWithEmailAndPassword("emailaddress@something.com", "pwd")
+                //firebaseAuth.signInWithEmailAndPassword("emailaddress@something.com", "pwd")
                 FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signInAnonymously()
                         .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
@@ -136,7 +127,7 @@ public class SpeechToTextService {
                             public void onSuccess(AuthResult authResult) {
                                 Log.d(TAG, "signInAnonymously:SUCCESS");
                                 speechToTextConversionData.setSigninToFirebaseSuccess(true);
-                                //emitter.onNext(speechToTextConversionData);
+                                emitter.onNext(speechToTextConversionData);
                                 emitter.onComplete();
                             }
                         })
@@ -148,8 +139,8 @@ public class SpeechToTextService {
                                 emitter.onError(exception);
                             }
                         });
-            }
-        });
+             }
+         });
         return observable;
     }
 
@@ -196,11 +187,50 @@ public class SpeechToTextService {
         Observable<SpeechToTextConversionData> observable = Observable.create(new ObservableOnSubscribe<SpeechToTextConversionData>() {
             @Override
             public void subscribe(@io.reactivex.annotations.NonNull ObservableEmitter<SpeechToTextConversionData> emitter) throws Exception {
-
+                // Instantiates a client with GOOGLE_APPLICATION_CREDENTIALS
+                Os.setenv("GOOGLE_APPLICATION_CREDENTIALS", "google-services.json", true);
+                SpeechClient speech = null;
+                Log.d(TAG, " convertGcsAudioFileToTextObservable. Current thread:" + Thread.currentThread());
                 try {
-                    // TODO - Add API calls to start/download speech to text file
-                    // TODO - Delete file on Firebase when done
 
+                    speech = SpeechClient.create();
+                    // Configure remote file request for Linear16
+                    RecognitionConfig config = RecognitionConfig.newBuilder()
+                            .setEncoding(RecognitionConfig.AudioEncoding.FLAC)
+                            .setLanguageCode("en-US")
+                            .setSampleRateHertz(16000)
+                            .build();
+                    RecognitionAudio audio = RecognitionAudio.newBuilder()
+                            .setUri(speechToTextConversionData.getGcsAudioFileName().toString())
+                            .build();
+
+                    // Use non-blocking call for getting file transcription
+                    OperationFuture<LongRunningRecognizeResponse, LongRunningRecognizeMetadata, Operation> response =
+                            speech.longRunningRecognizeAsync(config, audio);
+                    while (!response.isDone()) {
+                        Log.d(TAG, "Waiting for response...");
+                        Thread.sleep(10000);
+                    }
+
+                    List<SpeechRecognitionResult> results = response.get().getResultsList();
+
+                    StringBuilder sb = new StringBuilder();
+                    int alternativeIx = 0;
+                    for (SpeechRecognitionResult result : results) {
+                        List<SpeechRecognitionAlternative> alternatives = result.getAlternativesList();
+
+                        for (SpeechRecognitionAlternative alternative : alternatives) {
+                            Log.d(TAG, String.format("Transcription: %s%n", alternative.getTranscript()));
+                            sb.append(alternativeIx == 0 ? alternative.getTranscript() : "(" + alternative.getTranscript() + ")");
+                            alternativeIx++;
+                        }
+                        alternativeIx = 0;
+
+                    }
+                    speechToTextConversionData.setAudioText(sb.toString());
+                    speech.close();
+                    speechToTextConversionData.setAudioToTextSuccess(true);
+                    emitter.onNext(speechToTextConversionData);
                     emitter.onComplete();
 
                 } catch (Exception e) {

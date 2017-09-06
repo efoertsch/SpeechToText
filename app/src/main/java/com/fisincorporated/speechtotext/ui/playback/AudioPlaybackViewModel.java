@@ -2,6 +2,7 @@ package com.fisincorporated.speechtotext.ui.playback;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.view.View;
 
@@ -14,6 +15,7 @@ import com.fisincorporated.speechtotext.audio.utils.SpeechToTextService;
 import com.fisincorporated.speechtotext.databinding.AudioPlaybackBinding;
 import com.fisincorporated.speechtotext.ui.AudioBaseViewModel;
 import com.fisincorporated.speechtotext.ui.MediaPlayerAndController;
+import com.fisincorporated.speechtotext.ui.signin.SignInActivity;
 
 import javax.inject.Inject;
 
@@ -46,6 +48,11 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioR
 
     private final CompositeDisposable disposables = new CompositeDisposable();
 
+//    private FirebaseAuth firebaseAuth;
+//
+//    private FirebaseUser currentUser;
+
+
     @Inject
     public AudioPlaybackViewModel(Context context, AudioService audioService, AudioRecordUtils audioRecordUtils, SpeechToTextService speechToTextService) {
         this.context = context;
@@ -70,7 +77,7 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioR
             viewDataBinding.executePendingBindings();
             // TODO send filename to view to play
             mediaPlayerAndController.play(audioFile);
-            startSpeechToTextTranslation(audioRecord.getAudioFileName());
+
         }
     }
 
@@ -85,6 +92,11 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioR
         super.onDestroy();
         mediaPlayerAndController.release();
         disposables.dispose();
+    }
+
+    public void translateToText() {
+        Intent intent = new Intent(context, SignInActivity.class);
+        context.startActivity(intent);
     }
 
 
