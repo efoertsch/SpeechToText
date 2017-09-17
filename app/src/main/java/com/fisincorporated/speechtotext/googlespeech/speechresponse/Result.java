@@ -1,12 +1,12 @@
-package com.fisincorporated.speechtotext.googlespeech.translatedspeech;
+package com.fisincorporated.speechtotext.googlespeech.speechresponse;
 
-import com.fisincorporated.speechtotext.googlespeech.translatedspeech.Alternative;
+import com.fisincorporated.speechtotext.googlespeech.BaseJson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class Result {
+public class Result extends BaseJson {
 
     @SerializedName("alternatives")
     @Expose

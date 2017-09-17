@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.fisincorporated.speechtotext.audio.data.AudioRecord;
-import com.fisincorporated.speechtotext.audio.data.AudioRecordMigration;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -15,7 +14,6 @@ import javax.inject.Inject;
 
 import io.realm.OrderedRealmCollection;
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import io.realm.Sort;
 
 public class AudioRecordUtils {
@@ -28,35 +26,17 @@ public class AudioRecordUtils {
 
     private Realm realm;
 
-
-
     @Inject
     public AudioRecordUtils(Context context) {
         this.context = context;
-        Realm.init(context);
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder()
-                .name("audio.files")
-                .schemaVersion(2)
-                .migration(new AudioRecordMigration())
-                .initialData(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        realm.createObject(AudioRecord.class);
-                    }
-                })
-                .build();
-        //Realm.deleteRealm(realmConfig); // Delete Realm between app restarts.
-        Realm.setDefaultConfiguration(realmConfig);
         realm = Realm.getDefaultInstance();
-        long count = realm.where(AudioRecord.class).count();
-        Log.d(TAG, "number of audio records:" + count);
     }
 
     public OrderedRealmCollection<AudioRecord> getOrderedRealmCollection() {
         return realm.where(AudioRecord.class).notEqualTo(AudioRecord.FIELDS.id.name(), 0).findAllSorted(AudioRecord.FIELDS.id.name(), Sort.DESCENDING);
     }
 
-    public String getAudioDirectoryPath(){
+    public String getAudioDirectoryPath() {
         return context.getFilesDir() + fileSeparator;
     }
 
@@ -114,9 +94,11 @@ public class AudioRecordUtils {
 
     public void listAudioFiles() {
         File[] files = getAudioFiles();
+        File file;
         if (files != null && files.length > 0) {
             for (int i = 0; i < files.length; ++i) {
-                Log.d(TAG, files[i].getName());
+                file = files[i];
+                Log.d(TAG, file.getAbsolutePath() + " " + file.getName() + " " + file.length());
             }
         }
     }
@@ -126,6 +108,7 @@ public class AudioRecordUtils {
     public void createMissingAudioRecords() {
         boolean recordExists;
         File[] files = getAudioFiles();
+        Log.d(TAG, "Number of audio files found:" + files.length);
         List<AudioRecord> list = getAllAudioRecords(realm);
         if (files != null && files.length > 0) {
             for (File file : files) {
@@ -136,7 +119,7 @@ public class AudioRecordUtils {
                         if (audioRecord.getRecordDateTime().isEmpty()) {
                             AudioRecord clonedAudioRecord = realm.copyFromRealm(audioRecord);
                             clonedAudioRecord.setRecordDateTime(new Date(file.lastModified()).toString());
-                            updateAudioRecord(clonedAudioRecord);
+                            updateAudioRecordAsync(clonedAudioRecord);
                         }
                         break;
                     }
@@ -158,22 +141,25 @@ public class AudioRecordUtils {
         return nonRealmAudioRecord;
     }
 
-    public void updateAudioRecord(final AudioRecord audioRecord) {
+    public void updateAudioRecordAsync(final AudioRecord audioRecord) {
         if (audioRecord.isChanged()) {
             // Asynchronously update objects on a background thread
             realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm bgRealm) {
+
                     bgRealm.copyToRealmOrUpdate(audioRecord);
                 }
             }, new Realm.Transaction.OnSuccess() {
                 @Override
                 public void onSuccess() {
+
                     Log.e(TAG, "Success: audioRecord updated");
                 }
             }, new Realm.Transaction.OnError() {
                 @Override
                 public void onError(Throwable error) {
+
                     Log.e(TAG, "Error:" + error.toString());
                 }
             });
@@ -181,7 +167,22 @@ public class AudioRecordUtils {
         }
     }
 
-    public void deleteItemAsync(final long id) {
+    public void updateAudioRecordSync(final AudioRecord audioRecord) {
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(audioRecord);
+        realm.commitTransaction();
+    }
+
+    public void deleteAudioRecord(AudioRecord audioRecord) {
+        deleteAudioFile(audioRecord.getAudioFileName());
+        deleteAudioRecordByIdAsync(audioRecord.getId());
+    }
+
+    public void deleteAudioRecordByIdAsync(final long id) {
+        deleteAudioRecordByIdAsync(realm, id);
+    }
+
+    public void deleteAudioRecordByIdAsync(Realm realm, final long id) {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {

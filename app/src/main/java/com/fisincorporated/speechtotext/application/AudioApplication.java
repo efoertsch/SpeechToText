@@ -2,20 +2,11 @@ package com.fisincorporated.speechtotext.application;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
 import com.fisincorporated.speechtotext.dagger.application.DaggerApplicationComponent;
-import com.google.common.io.BaseEncoding;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import javax.inject.Inject;
 
@@ -23,8 +14,12 @@ import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
 import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasDispatchingActivityInjector;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
-public class AudioApplication extends Application implements HasDispatchingActivityInjector {
+public class AudioApplication extends Application
+//public class AudioApplication extends Application
+        implements HasDispatchingActivityInjector {
     private static final String TAG = AudioApplication.class.getSimpleName();
 
     @Inject
@@ -33,37 +28,36 @@ public class AudioApplication extends Application implements HasDispatchingActiv
     @Inject
     AudioRecordUtils audioRecordsUtils;
 
-    private StorageReference storageRef;
-
     @Override
     public void onCreate() {
         super.onCreate();
+        connectRealm();
         createDaggerInjections();
         audioRecordsUtils.listAudioFiles();
         audioRecordsUtils.createMissingAudioRecords();
-        storageRef = FirebaseStorage.getInstance().getReference();
         loadAudioConverter();
-        displayPackageAndSigniture();
+
+
     }
 
-    private void displayPackageAndSigniture() {
-        String packageName = getPackageName();
-        Log.d(TAG, "Package name:" + getPackageName());
-        // String sig = getSignature(getPackageManager(), packageName);
-        PackageInfo packageInfo = null;
-        try {
-            packageInfo = getPackageManager().getPackageInfo(packageName, PackageManager.GET_SIGNATURES);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        if (packageInfo == null
-                || packageInfo.signatures == null
-                || packageInfo.signatures.length == 0
-                || packageInfo.signatures[0] == null) {
-          //  return null;
-        }
-        //return signatureDigest(packageInfo.signatures[0]);
-        Log.d(TAG, "Package signature:" + packageInfo.signatures[0]);
+    private void connectRealm() {
+        Realm.init(this);
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder()
+                .name("audio.files")
+                .schemaVersion(0)
+                //.migration(new AudioRecordMigration())
+                .initialData(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        realm.createObject(AudioRecord.class, new Long(0));
+                    }
+                })
+                .build();
+        //Realm.deleteRealm(realmConfig); // Delete Realm between app restarts.
+        Realm.setDefaultConfiguration(realmConfig);
+        Realm realm = Realm.getDefaultInstance();
+        long count = realm.where(AudioRecord.class).count();
+        Log.d(TAG, "number of audio records:" + count);
     }
 
     protected void createDaggerInjections() {
@@ -92,32 +86,5 @@ public class AudioApplication extends Application implements HasDispatchingActiv
             }
         });
     }
-
-    public static String getSignature(@NonNull PackageManager pm, @NonNull String packageName) {
-               try {
-                        PackageInfo packageInfo = pm.getPackageInfo(packageName, PackageManager.GET_SIGNATURES);
-                         if (packageInfo == null
-                                       || packageInfo.signatures == null
-                                         || packageInfo.signatures.length == 0
-                                        || packageInfo.signatures[0] == null) {
-                                return null;
-                            }
-                        return signatureDigest(packageInfo.signatures[0]);
-                    } catch (PackageManager.NameNotFoundException e) {
-                        return null;
-                   }
-    }
-
-    private static String signatureDigest(Signature sig) {
-        byte[] signature = sig.toByteArray();
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA1");
-            byte[] digest = md.digest(signature);
-            return BaseEncoding.base16().lowerCase().encode(digest);
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        }
-    }
-
 
 }

@@ -1,12 +1,16 @@
 package com.fisincorporated.speechtotext.googlespeech.speechresponse;
 
+import com.fisincorporated.speechtotext.googlespeech.BaseJson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class Error {
+public class Error extends BaseJson {
 
+    @SerializedName("errors")
+    @Expose
+    private List<ErrorMsg> errors = null;
     @SerializedName("code")
     @Expose
     private Integer code;
@@ -16,6 +20,14 @@ public class Error {
     @SerializedName("details")
     @Expose
     private List<Detail> details = null;
+
+    public List<ErrorMsg> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(List<ErrorMsg> errors) {
+        this.errors = errors;
+    }
 
     public Integer getCode() {
         return code;

@@ -1,35 +1,96 @@
 package com.fisincorporated.speechtotext.audio.utils;
 
 
-import android.net.Uri;
-import android.os.Parcel;
-import android.os.Parcelable;
+import com.fisincorporated.speechtotext.googlespeech.BaseJson;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-public class SpeechToTextConversionData implements Parcelable {
 
+//TODO remove unneeded fields/cleanup
+public class SpeechToTextConversionData extends BaseJson {
+
+    public static final String SPEECH_TO_TEXT_CONVERSION_DATA = "SPEECH_TO_TEXT_CONVERSION_DATA";
+
+    @SerializedName("deviceAbsolutePathToAudioFile")
+    @Expose
     private String deviceAbsolutePathToAudioFile = "";
 
+    @SerializedName("audio3gpFileName")
+    @Expose
     private String audio3gpFileName = "";
 
+    @SerializedName("audioFlacFileName")
+    @Expose
     private String audioFlacFileName = "";
 
+    @SerializedName("flacConversionSuccess")
+    @Expose
     private boolean flacConversionSuccess = false;
 
+    @SerializedName("signinToFirebaseSuccess")
+    @Expose
     private boolean signinToFirebaseSuccess = false;
 
+    @SerializedName("uploadToGcsSuccess")
+    @Expose
     private boolean uploadToGcsSuccess = false;
 
-    private Uri gcsAudioFileName ;
+    @SerializedName("gcsAudioFileName")
+    @Expose
+    private String gcsAudioFileName ;
 
+    @SerializedName("audioToTextSuccess")
+    @Expose
     private boolean audioToTextSuccess = false;
 
+    @SerializedName("mimeType")
+    @Expose
+    private String mimeType = "";
+
+    @SerializedName("audioText")
+    @Expose
     private String audioText = "";
 
+    @SerializedName("exception")
+    @Expose
     private Exception exception;
+
+    @SerializedName("oauth2Token")
+    @Expose
+    private String oauth2Token = "";
+
+    @SerializedName("audioRecordRealmId")
+    @Expose
+    private long audioRecordRealmId = 0;
+
+    @SerializedName("longunningrecognizeid")
+    @Expose
+    private String longRunningRecognizeName = "";
+
+    @SerializedName("longrunningrecognizeerror")
+    @Expose
+    private String longRunningRecognizeError = "";
+
+    @SerializedName("longrunningrecognizetext")
+    @Expose
+    private String longRunningRecognizeText = "";
+
+    @SerializedName("updateToRealmSuccess")
+    @Expose
+    private boolean updateToRealmSuccess;
+
+    @SerializedName("translationAttempts")
+    @Expose
+    private int translationAttempts = 0;
+
+    @SerializedName("translationDone")
+    @Expose
+    private boolean translationDone = false;
 
     private SpeechToTextConversionData(){}
 
-    public SpeechToTextConversionData(String deviceAbsolutePathToAudioFile, String audio3gpFileName){
+    public SpeechToTextConversionData(long audioRecordRealmId, String deviceAbsolutePathToAudioFile, String audio3gpFileName){
+        this.audioRecordRealmId = audioRecordRealmId;
         this.deviceAbsolutePathToAudioFile = deviceAbsolutePathToAudioFile;
         this.audio3gpFileName = audio3gpFileName;
     };
@@ -45,7 +106,6 @@ public class SpeechToTextConversionData implements Parcelable {
     public String getAbsolute3gpFileName() {
         return deviceAbsolutePathToAudioFile +  audio3gpFileName;
     }
-
 
     public String getAudioFlacFileName() {
         return audioFlacFileName;
@@ -83,11 +143,11 @@ public class SpeechToTextConversionData implements Parcelable {
         this.uploadToGcsSuccess = uploadToGcsSuccess;
     }
 
-    public Uri getGcsAudioFileName() {
+    public String getGcsAudioFileName() {
         return gcsAudioFileName;
     }
 
-    public void setGcsAudioFileName(Uri gcsAudioFileName) {
+    public void setGcsAudioFileName(String gcsAudioFileName) {
         this.gcsAudioFileName = gcsAudioFileName;
     }
 
@@ -115,59 +175,72 @@ public class SpeechToTextConversionData implements Parcelable {
         this.exception = exception;
     }
 
-    public String toString(){
-        return " deviceAbsolutePathToAudioFile:" + deviceAbsolutePathToAudioFile
-                + "\n3gpFileName: " + audio3gpFileName
-                + "\n audioFlacFileName: " + audioFlacFileName
-                + "\n converted 3gp to flac: " +  flacConversionSuccess
-                + "\n signed in to Firebase successfully: " +  signinToFirebaseSuccess
-                + "\n uploaded to Google Cloud Services successfully: " + uploadToGcsSuccess
-                + "\n converted audio to text successfully: " + audioToTextSuccess
-                + "\n converted text: " + audioText
-                + "\n " + (exception == null ? "" : exception.toString());
+    public String getOauth2Token() {
+        return oauth2Token;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public void setOauth2Token(String oauth2Token) {
+        this.oauth2Token = oauth2Token;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.deviceAbsolutePathToAudioFile);
-        dest.writeString(this.audio3gpFileName);
-        dest.writeString(this.audioFlacFileName);
-        dest.writeByte(this.flacConversionSuccess ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.signinToFirebaseSuccess ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.uploadToGcsSuccess ? (byte) 1 : (byte) 0);
-        dest.writeParcelable(this.gcsAudioFileName, flags);
-        dest.writeByte(this.audioToTextSuccess ? (byte) 1 : (byte) 0);
-        dest.writeString(this.audioText);
-        dest.writeSerializable(this.exception);
+    public long getAudioRecordRealmId() {
+        return audioRecordRealmId;
     }
 
-    protected SpeechToTextConversionData(Parcel in) {
-        this.deviceAbsolutePathToAudioFile = in.readString();
-        this.audio3gpFileName = in.readString();
-        this.audioFlacFileName = in.readString();
-        this.flacConversionSuccess = in.readByte() != 0;
-        this.signinToFirebaseSuccess = in.readByte() != 0;
-        this.uploadToGcsSuccess = in.readByte() != 0;
-        this.gcsAudioFileName = in.readParcelable(Uri.class.getClassLoader());
-        this.audioToTextSuccess = in.readByte() != 0;
-        this.audioText = in.readString();
-        this.exception = (Exception) in.readSerializable();
+
+    public void setAudioRecordRealmId(long audioRecordRealmId) {
+        this.audioRecordRealmId = audioRecordRealmId;
     }
 
-    public static final Creator<SpeechToTextConversionData> CREATOR = new Creator<SpeechToTextConversionData>() {
-        @Override
-        public SpeechToTextConversionData createFromParcel(Parcel source) {
-            return new SpeechToTextConversionData(source);
-        }
+    public String getLongRunningRecognizeName() {
+        return longRunningRecognizeName;
+    }
 
-        @Override
-        public SpeechToTextConversionData[] newArray(int size) {
-            return new SpeechToTextConversionData[size];
-        }
-    };
+    public void setLongRunningRecognizeName(String longRunningRecognizeName) {
+        this.longRunningRecognizeName = longRunningRecognizeName;
+    }
+
+    public String getLongRunningRecognizeError() {
+        return longRunningRecognizeError;
+    }
+
+    public void setLongRunningRecognizeError(String longRunningRecognizeError) {
+        this.longRunningRecognizeError = longRunningRecognizeError;
+    }
+
+    public boolean isUpdateToRealmSuccess() {
+        return updateToRealmSuccess;
+    }
+
+    public void setUpdateToRealmSuccess(boolean updateToRealmSuccess) {
+        this.updateToRealmSuccess = updateToRealmSuccess;
+    }
+
+    public int getTranslationAttempts() {
+        return translationAttempts;
+    }
+
+    public void setTranslationAttempts(int translationAttempts) {
+        this.translationAttempts = translationAttempts;
+    }
+
+    public void incrementTranslationAttempts() {
+        translationAttempts++;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public boolean isTranslationDone() {
+        return translationDone;
+    }
+
+    public void setTranslationDone(boolean translationDone) {
+        this.translationDone = translationDone;
+    }
 }

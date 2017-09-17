@@ -1,9 +1,10 @@
 package com.fisincorporated.speechtotext.googlespeech.speechresponse;
 
+import com.fisincorporated.speechtotext.googlespeech.BaseJson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Detail {
+public class Detail  extends BaseJson {
 
     @SerializedName("@type")
     @Expose

@@ -4,6 +4,7 @@ package com.fisincorporated.speechtotext.ui.playback;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.media.MediaPlayer;
 import android.view.View;
 
 import com.fisincorporated.speechtotext.R;
@@ -65,6 +66,13 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioR
         bindingView = view.findViewById(R.id.audio_playback_layout);
         viewDataBinding = DataBindingUtil.bind(bindingView);
         mediaPlayerAndController = viewDataBinding.audioPlaybackMediaController;
+        mediaPlayerAndController.addOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.pause();
+                mp.seekTo(0);
+            }
+        });
         return this;
     }
 
@@ -103,7 +111,7 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioR
     private void startSpeechToTextTranslation(String filename) {
         //return speechToTextService.startSpeechToTextTranslation(audioRecordUtils.getAbsoluteFileName(filename), filename);
 
-        SpeechToTextConversionData speechToTextConversionData = new SpeechToTextConversionData(audioRecordUtils.getAudioDirectoryPath(), filename);
+        SpeechToTextConversionData speechToTextConversionData = new SpeechToTextConversionData(audioRecord.getId(), audioRecordUtils.getAudioDirectoryPath(), filename);
         Observable<SpeechToTextConversionData> observable = speechToTextService.getSpeechToTextObservable(speechToTextConversionData);
 
         DisposableObserver<SpeechToTextConversionData> observer = new DisposableObserver<SpeechToTextConversionData>() {
@@ -140,7 +148,7 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioR
 
     // Called via xml onClick
     public void updateAudioRecord() {
-        audioRecordUtils.updateAudioRecord(audioRecord);
+        audioRecordUtils.updateAudioRecordAsync(audioRecord);
     }
 
     public void stopPlaying() {

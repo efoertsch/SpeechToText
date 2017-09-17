@@ -2,10 +2,11 @@ package com.fisincorporated.speechtotext.googlespeech.speechrequest;
 
 
 
+import com.fisincorporated.speechtotext.googlespeech.BaseJson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class RecognitionAudio {
+public class RecognitionAudio extends BaseJson {
 
     //Either content or uri must be supplied. Supplying both or neither returns google.rpc.Code.INVALID_ARGUMENT
 

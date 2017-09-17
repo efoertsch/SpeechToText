@@ -90,4 +90,12 @@
     <string name="firebase_status_fmt">Firebase User: %s</string>
     <string name="firebase_user_management">Firebase User Management</string>
 
+    <!-- Google/Firebase signon error -->
+    <string name="signOnError">Sign On Error</string>
+    <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
+    <string name="google_signin_unsuccessful">Google Sign in unsuccessful</string>
+    <string name="firebase_signin_unsuccessful">Firebase signin unsuccessful</string>
+    <string name="error_on_getting_oauth2_token">An error occurred while getting Oauth2 token</string>
+
 </resources>

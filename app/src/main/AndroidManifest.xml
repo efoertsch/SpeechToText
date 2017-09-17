@@ -41,7 +41,7 @@
         </activity>
 
         <service
-            android:name=".translation.XlatSchedulerService"
+            android:name=".jobscheduler.TranslationJobService"
             android:label="For audio to text translation"
             android:permission="android.permission.BIND_JOB_SERVICE" >
 

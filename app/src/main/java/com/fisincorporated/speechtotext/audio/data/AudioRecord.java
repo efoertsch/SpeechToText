@@ -62,7 +62,6 @@ public class AudioRecord extends RealmObject implements AudioRecordInfo {
 
     private String description;
 
-    //TODO change name
     private String speechToTextTranslation;
 
     private int speechToTextStatus = 0;

@@ -3,9 +3,9 @@ package com.fisincorporated.speechtotext.gcs;
 import com.fisincorporated.speechtotext.googlespeech.speechrequest.LongRunningRecognize;
 import com.fisincorporated.speechtotext.googlespeech.speechrequest.RecognitionAudio;
 import com.fisincorporated.speechtotext.googlespeech.speechrequest.RecognitionConfig;
-import com.fisincorporated.speechtotext.googlespeech.speechrequest.RecognizeResponse;
-import com.fisincorporated.speechtotext.retrofit.AppRetrofit;
-import com.fisincorporated.speechtotext.retrofit.GoogleCloudServicesApi;
+import com.fisincorporated.speechtotext.googlespeech.speechresponse.OperationResponse;
+import com.fisincorporated.speechtotext.retrofit.GoogleSpeechRetrofit;
+import com.fisincorporated.speechtotext.retrofit.GoogleSpeechServicesApi;
 import com.fisincorporated.speechtotext.retrofit.LoggingInterceptor;
 
 import org.junit.Test;
@@ -21,10 +21,10 @@ public class SpeechToTextTest {
 
     @Test
     public void shouldStartSpeechToTextConverstion() throws IOException {
-        Retrofit retrofit = new AppRetrofit(new LoggingInterceptor()).getRetrofit();
-        GoogleCloudServicesApi client = retrofit.create(GoogleCloudServicesApi.class);
+        Retrofit retrofit = new GoogleSpeechRetrofit(new LoggingInterceptor()).getRetrofit();
+        GoogleSpeechServicesApi client = retrofit.create(GoogleSpeechServicesApi.class);
 
-        final Call<RecognizeResponse> call;
+        final Call<OperationResponse> call;
 
         RecognitionConfig recognitionConfig = new RecognitionConfig();
         recognitionConfig.setEncoding(RecognitionConfig.AudioEncoding.FLAC.name());
@@ -44,17 +44,15 @@ public class SpeechToTextTest {
         longRunningRecognize.setConfig(recognitionConfig);
         longRunningRecognize.setAudio(recognitionAudio);
 
-        call = client.callSpeechToTextApi("AIzaSyCQJwSl4QMmc4Bkh8df4QuM9au9u7WV3fY", "C6:33:10:56:B2:7A:06:D7:D9:7C:83:26:54:A6:94:0D:00:EB:2F:1D", "com.fisincorporated.speechtotext", longRunningRecognize);
+        call = client.callSpeechToTextApi("put in bearer token", longRunningRecognize);
 
         //AIzaSyAlMsCm7goQVAJa3UVSYKZOg4KqeHNqA6c
         //call = client.callSpeechToTextApiKeyOnly("AIzaSyAlMsCm7goQVAJa3UVSYKZOg4KqeHNqA6c", longRunningRecognize);
 
-        RecognizeResponse response = call.execute().body();
+        OperationResponse response = call.execute().body();
 
         System.out.println(response.toString());
 
     }
-
-
 
 }

@@ -15,13 +15,26 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        //multiDexEnabled true
     }
     buildTypes {
+//        debug{
+//          multiDexKeepFile file ('multidex-config.txt')
+//        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            multiDexKeepFile  file ('multidex-config.txt')
         }
     }
+
+//
+//    dexOptions {
+//        incremental true
+//        // here heap size give 4g i got this thing from https://groups.google.com/forum/#!topic/adt-dev/P_TLBTyFWVY
+//
+//        javaMaxHeapSize "4g"
+//    }
 
     dataBinding {
         enabled = true
@@ -64,20 +77,20 @@ dependencies {
     final FIREBASE_VERSION = '11.2.0'  //'10.0.1'
     final GOOGLE_API_CLIENT = '1.22.0'
 
+    //Retrofit
+    compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
+    compile ("com.squareup.retrofit2:adapter-rxjava2:$RETROFIT_VERSION") {
+        exclude group: 'io.reactivex.java2', module: 'rxjava'
+    }
+    compile "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
+
     // Android compat/support libraries
     compile "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:design:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:recyclerview-v7:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:support-v4:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:support-annotations:$SUPPORT_LIBRARY_VERSION"
-    compile "com.android.support:support-v4:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support.constraint:constraint-layout:$CONSTRAINT_LAYOUT_VERSION"
-
-    // See project level build.gradle for Realm plugin
-    // Realm recycler view
-
-    //Google Signin
-    compile 'com.google.android.gms:play-services-auth:11.2.0'
 
     // Speech To Text
     // Using API calls instead
@@ -85,13 +98,6 @@ dependencies {
 
     // Convert to convert 3gp audio to flac - https://github.com/adrielcafe/AndroidAudioConverter
     compile 'com.github.adrielcafe:AndroidAudioConverter:0.0.8'
-
-    //Retrofit
-    compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
-    compile ("com.squareup.retrofit2:adapter-rxjava2:$RETROFIT_VERSION") {
-        exclude group: 'io.reactivex.java2', module: 'rxjava'
-    }
-    compile "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
 
     //RxJava
     compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.1'
@@ -108,6 +114,7 @@ dependencies {
     compile "com.google.dagger:dagger-android-support:$DAGGER_VERSION"
     provided "javax.annotation:jsr250-api:$JSR250_VERSION"
 
+    // See project level build.gradle for Realm plugin
     // For Realm recyclerView adapter
     compile  'io.realm:android-adapters:1.4.0'
 
@@ -120,11 +127,9 @@ dependencies {
     compile "com.google.api-client:google-api-client:$GOOGLE_API_CLIENT"
     compile "com.google.api-client:google-api-client-android:$GOOGLE_API_CLIENT"
 
+    // Mulitdex - not needed for Android 5.0 and higher
+    //compile 'com.android.support:multidex:1.0.1'
 
-    // OAuth2
-    // com.google.gms:google-services:3.1.0 in project build.gradle conflicts with play services 11.0.4
-    //compile 'com.google.android.gms:play-services-auth:11.0.4'
-    //compile 'com.google.android.gms:play-services:9.0.0'
 
     androidTestCompile("com.android.support.test.espresso:espresso-core:$ESPRESSO_CORE_VERSION", {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -133,8 +138,22 @@ dependencies {
 
     testCompile "junit:junit:$JUNIT4_VERSION"
 
-
-
 }
 
+
+buildscript {
+    repositories {
+        mavenCentral() // or jcenter()
+    }
+
+    dependencies {
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.7.3'
+
+    }
+}
+
+// Process the google-services.json
 apply plugin: 'com.google.gms.google-services'
+
+// make sure this line comes *after* you apply the Android plugin
+apply plugin: 'com.getkeepsafe.dexcount'

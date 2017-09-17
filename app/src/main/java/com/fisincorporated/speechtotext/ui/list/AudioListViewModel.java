@@ -96,7 +96,7 @@ public class AudioListViewModel extends AudioBaseViewModel implements PlayAudioC
 
         @Override
         public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
-            audioRecordUtils.deleteItemAsync(viewHolder.getItemId());
+            audioRecordUtils.deleteAudioRecordByIdAsync(viewHolder.getItemId());
         }
 
         @Override

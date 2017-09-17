@@ -5,7 +5,8 @@ import android.content.Context;
 import com.fisincorporated.speechtotext.application.AudioApplication;
 import com.fisincorporated.speechtotext.audio.AudioService;
 import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
-import com.fisincorporated.speechtotext.retrofit.AppRetrofit;
+import com.fisincorporated.speechtotext.retrofit.GcsRetrofit;
+import com.fisincorporated.speechtotext.retrofit.GoogleSpeechRetrofit;
 import com.fisincorporated.speechtotext.retrofit.LoggingInterceptor;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -31,7 +32,6 @@ public class ApplicationModule {
     }
 
     @Provides
-    @Singleton
     public AudioRecordUtils providesAudioRecordUtils(AudioApplication application) {
         return new AudioRecordUtils(application);
     }
@@ -44,9 +44,16 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    public Retrofit provideAppRetrofit() {
-        return new AppRetrofit(getInterceptor()).getRetrofit();
+    public Retrofit provideGcsRetrofit() {
+        return new GcsRetrofit(getInterceptor()).getRetrofit();
     }
+
+    @Provides
+    @Singleton
+    public Retrofit provideGoogleSpeechRetrofit() {
+        return new GoogleSpeechRetrofit(getInterceptor()).getRetrofit();
+    }
+
 
     @Provides
     @Singleton

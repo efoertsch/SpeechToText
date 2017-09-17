@@ -1,13 +1,15 @@
-package com.fisincorporated.speechtotext.googlespeech.translatedspeech;
+package com.fisincorporated.speechtotext.googlespeech.speechresponse;
 
+import com.fisincorporated.speechtotext.googlespeech.BaseJson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Alternative {
+public class Alternative extends BaseJson {
 
     @SerializedName("transcript")
     @Expose
     private String transcript;
+
     @SerializedName("confidence")
     @Expose
     private Double confidence;

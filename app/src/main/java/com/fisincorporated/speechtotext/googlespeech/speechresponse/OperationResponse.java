@@ -1,22 +1,38 @@
-package com.fisincorporated.speechtotext.googlespeech.translatedspeech;
+package com.fisincorporated.speechtotext.googlespeech.speechresponse;
 
+import com.fisincorporated.speechtotext.googlespeech.BaseJson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class TranslatedAudioResponse {
+import java.util.List;
+
+import io.grpc.Metadata;
+
+public class OperationResponse extends BaseJson {
 
     @SerializedName("name")
     @Expose
     private String name;
+
     @SerializedName("metadata")
     @Expose
     private Metadata metadata;
+
     @SerializedName("done")
     @Expose
     private Boolean done;
+
+    @SerializedName("error")
+    @Expose
+    private Error error;
+
+    @SerializedName("errors")
+    @Expose
+    private List<ErrorMsg> errors = null;
+
     @SerializedName("response")
     @Expose
-    private Response response;
+    private SpeechResponse speechResponse;
 
     public String getName() {
         return name;
@@ -42,12 +58,20 @@ public class TranslatedAudioResponse {
         this.done = done;
     }
 
-    public Response getResponse() {
-        return response;
+    public Error getError() {
+        return error;
     }
 
-    public void setResponse(Response response) {
-        this.response = response;
+    public void setError(Error error) {
+        this.error = error;
+    }
+
+    public SpeechResponse getSpeechResponse() {
+        return speechResponse;
+    }
+
+    public void setSpeechResponse(SpeechResponse speechResponse) {
+        this.speechResponse = speechResponse;
     }
 
 }

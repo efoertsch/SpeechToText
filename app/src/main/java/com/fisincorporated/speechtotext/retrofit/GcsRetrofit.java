@@ -7,30 +7,30 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class AppRetrofit {
+public class GcsRetrofit {
 
-    public static final String GOOLGLE_SPEECH_URL = "https://speech.googleapis.com/";
+    public static final String GCS_URL = "https://www.googleapis.com/upload/storage/v1/b/";
 
     private Retrofit retrofit;
 
     @Inject
-    public AppRetrofit(Interceptor interceptor){
+    public GcsRetrofit(Interceptor interceptor) {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         if (interceptor != null) {
             httpClient.addInterceptor(interceptor);
         }
-        Retrofit.Builder builder = new Retrofit.Builder()
-                .baseUrl(GOOLGLE_SPEECH_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(new OkHttpClient());
 
-        retrofit = builder.client(httpClient.build()).build();
-    };
+        Retrofit.Builder builder = new Retrofit.Builder()
+                .baseUrl(GCS_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build());
+
+        retrofit = builder.build();
+    }
 
     public Retrofit getRetrofit() {
         return retrofit;
     }
-
-
-
 }
+
+

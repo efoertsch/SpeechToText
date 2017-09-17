@@ -7,7 +7,6 @@ import com.fisincorporated.speechtotext.audio.utils.SpeechToTextService;
 import com.fisincorporated.speechtotext.dagger.annotations.PerActivity;
 import com.fisincorporated.speechtotext.ui.playback.AudioPlaybackActivity;
 import com.fisincorporated.speechtotext.ui.playback.AudioPlaybackViewModel;
-import com.google.firebase.storage.StorageReference;
 
 import javax.inject.Singleton;
 
@@ -24,8 +23,8 @@ public class AudioPlaybackActivityModule {
     }
 
     @Provides
-    public SpeechToTextService providesSpeechToTextService(AudioPlaybackActivity activity, @Singleton StorageReference storageReference) {
-        return new SpeechToTextService(activity, storageReference);
+    public SpeechToTextService providesSpeechToTextService(AudioPlaybackActivity activity) {
+        return new SpeechToTextService(activity);
     }
 
 
