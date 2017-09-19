@@ -7,8 +7,6 @@ import android.util.Log;
 
 import com.fisincorporated.speechtotext.audio.utils.SpeechToTextConversionData;
 import com.fisincorporated.speechtotext.audio.utils.SpeechToTextService;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -92,7 +90,7 @@ public class TranslationJobService extends JobService {
         SpeechToTextConversionData speechToTextConversionData = getConversionData(params);
         if (speechToTextConversionData != null) {
 
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+          //  StorageReference storageRef = FirebaseStorage.getInstance().getReference();
             Observable<SpeechToTextConversionData> observable = speechToTextService.getSpeechToTextObservable(speechToTextConversionData);
 
             DisposableObserver<SpeechToTextConversionData> observer = new DisposableObserver<SpeechToTextConversionData>() {

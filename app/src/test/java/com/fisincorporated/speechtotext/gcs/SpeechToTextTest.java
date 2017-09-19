@@ -38,7 +38,7 @@ public class SpeechToTextTest {
         //recognitionConfig.setSpeechContexts();
 
         RecognitionAudio recognitionAudio = new RecognitionAudio();
-        recognitionAudio.setUri("gs://speechtotext-f653f.appspot.com/audio/917ba572-2633-42bf-96ee-6eab04858361.flac");
+        recognitionAudio.setUri("gs://speech-to-text-fisincorporated-com/917ba572-2633-42bf-96ee-6eab04858361.flac");
 
         LongRunningRecognize longRunningRecognize = new LongRunningRecognize();
         longRunningRecognize.setConfig(recognitionConfig);

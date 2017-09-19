@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GcsRetrofit {
 
-    public static final String GCS_URL = "https://www.googleapis.com/upload/storage/v1/b/";
+    public static final String GCS_URL = "https://www.googleapis.com/";
 
     private Retrofit retrofit;
 

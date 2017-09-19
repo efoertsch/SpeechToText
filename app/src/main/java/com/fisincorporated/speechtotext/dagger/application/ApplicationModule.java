@@ -8,8 +8,6 @@ import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
 import com.fisincorporated.speechtotext.retrofit.GcsRetrofit;
 import com.fisincorporated.speechtotext.retrofit.GoogleSpeechRetrofit;
 import com.fisincorporated.speechtotext.retrofit.LoggingInterceptor;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import javax.inject.Singleton;
 
@@ -36,11 +34,11 @@ public class ApplicationModule {
         return new AudioRecordUtils(application);
     }
 
-    @Provides
-    @Singleton
-    public StorageReference providesStorageReference() {
-        return FirebaseStorage.getInstance().getReference();
-    }
+//    @Provides
+//    @Singleton
+//    public StorageReference providesStorageReference() {
+//        return FirebaseStorage.getInstance().getReference();
+//    }
 
     @Provides
     @Singleton

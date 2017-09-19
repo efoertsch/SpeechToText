@@ -50,18 +50,9 @@ public class AudioListAdapter extends RealmRecyclerViewAdapter<AudioRecord, Audi
                 }
             });
         }
-        if (holder.speechToTextView != null &&
-                (audioRecord.getSpeechToTextTranslation() == null
-         || audioRecord.getSpeechToTextTranslation().isEmpty())
-                && audioRecord.getSpeechToTextStatus() <=0) {
-            holder.speechToTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+        holder.speechToTextView.setVisibility((audioRecord.getSpeechToTextTranslation() != null
+                            && !audioRecord.getSpeechToTextTranslation().isEmpty()) ? View.VISIBLE : View.GONE);
 
-
-                }
-            });
-        }
     }
 
     @Override
@@ -77,7 +68,7 @@ public class AudioListAdapter extends RealmRecyclerViewAdapter<AudioRecord, Audi
         TextView title;
         TextView recordDate;
         ImageButton playAudioButton;
-        View  speechToTextView;
+        TextView  speechToTextView;
 
         public AudioRecord data;
 
@@ -86,7 +77,7 @@ public class AudioListAdapter extends RealmRecyclerViewAdapter<AudioRecord, Audi
             title = (TextView) view.findViewById(R.id.audio_record_description);
             recordDate = (TextView) view.findViewById(R.id.audio_record_date);
             playAudioButton = (ImageButton) view.findViewById(R.id.audio_record_play_image);
-            speechToTextView = view.findViewById(R.id.audio_record_speech_to_text_view);
+            speechToTextView = (TextView) view.findViewById(R.id.audio_record_speech_to_text);
 
         }
     }

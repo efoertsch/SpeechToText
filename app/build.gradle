@@ -74,7 +74,7 @@ dependencies {
     final ESPRESSO_CORE_VERSION = '2.2.2'
     final JUNIT4_VERSION = '4.12'
     final RETROFIT_VERSION = '2.3.0'
-    final FIREBASE_VERSION = '11.2.0'  //'10.0.1'
+    final FIREBASE_VERSION = '11.2.2'  //'10.0.1'
     final GOOGLE_API_CLIENT = '1.22.0'
 
     //Retrofit
@@ -118,18 +118,20 @@ dependencies {
     // For Realm recyclerView adapter
     compile  'io.realm:android-adapters:1.4.0'
 
-    // Authenticate using Google sign-in
+    // Authenticate using Google sign-in - note firebase is needed even if not using firebase api's
     compile "com.google.android.gms:play-services-auth:$FIREBASE_VERSION"
-    compile "com.google.firebase:firebase-auth:$FIREBASE_VERSION"
-    // Upload/download files to google/firebase cloud storage
-    compile "com.google.firebase:firebase-storage:$FIREBASE_VERSION"
     // Google Api Client library and Android extension
     compile "com.google.api-client:google-api-client:$GOOGLE_API_CLIENT"
     compile "com.google.api-client:google-api-client-android:$GOOGLE_API_CLIENT"
+    // Needed Firebase auth to be able to sign in and get OAuth2 token
+     compile "com.google.firebase:firebase-auth:$FIREBASE_VERSION"
+    // Upload/download files to google/firebase cloud storage
+    // (Although was able to upload files via gcs apii, for the life of me I couldn't delete the file via gcs api
+    // So using firebase storage for upload/delete
+    compile "com.google.firebase:firebase-storage:$FIREBASE_VERSION"
 
-    // Mulitdex - not needed for Android 5.0 and higher
+    // Mulitdex - built in for Android 5.0 and higher
     //compile 'com.android.support:multidex:1.0.1'
-
 
     androidTestCompile("com.android.support.test.espresso:espresso-core:$ESPRESSO_CORE_VERSION", {
         exclude group: 'com.android.support', module: 'support-annotations'

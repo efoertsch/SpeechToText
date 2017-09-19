@@ -38,7 +38,7 @@ public class LoggingInterceptor implements Interceptor {
 
         String bodyString = response.body().string();
         if (BuildConfig.DEBUG) {
-            System.out.println("LoggingInterceptor: response only" + "\n" + bodyString);
+           // System.out.println("LoggingInterceptor: response only" + "\n" + bodyString);
 
             System.out.println("LoggingInterceptor: response" + "\n" + responseLog + "\n" + bodyString);
         }

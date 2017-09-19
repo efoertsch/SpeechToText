@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:text="@string/title_text"
+            android:text="@string/google_sign_in"
             android:gravity="center"
             android:textColor="@android:color/white"
             android:textSize="36sp" />
