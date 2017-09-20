@@ -19,3 +19,7 @@ gradlew.bat
 .idea/vcs.xml
 .idea/copyright/profiles_settings.xml
 .idea/markdown-navigator/profiles_settings.xml
+libs/
+src/debug/
+src/main/res/raw/
+src/release/

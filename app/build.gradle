@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 //Adding Realm - plugin defined in project level build.gradle
 apply plugin: 'realm-android'
-
+// Retrolamdba of course
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
@@ -15,13 +15,26 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        //multiDexEnabled true
     }
     buildTypes {
+//        debug{
+//          multiDexKeepFile file ('multidex-config.txt')
+//        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            multiDexKeepFile  file ('multidex-config.txt')
         }
     }
+
+//
+//    dexOptions {
+//        incremental true
+//        // here heap size give 4g i got this thing from https://groups.google.com/forum/#!topic/adt-dev/P_TLBTyFWVY
+//
+//        javaMaxHeapSize "4g"
+//    }
 
     dataBinding {
         enabled = true
@@ -31,14 +44,45 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/io.netty.versions.properties'
+        exclude 'META-INF/INDEX.LIST'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'project.properties'
+    }
+}
+
+repositories {
+    maven {
+        url "https://jitpack.io"
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     final SUPPORT_LIBRARY_VERSION = '25.3.1'
+    final CONSTRAINT_LAYOUT_VERSION = '1.0.2'
     final DAGGER_VERSION = '2.10'
     final JSR250_VERSION = '1.0'
+    final ESPRESSO_CORE_VERSION = '2.2.2'
+    final JUNIT4_VERSION = '4.12'
+    final RETROFIT_VERSION = '2.3.0'
+    final FIREBASE_VERSION = '11.2.2'  //'10.0.1'
+    final GOOGLE_API_CLIENT = '1.22.0'
+
+    //Retrofit
+    compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
+    compile ("com.squareup.retrofit2:adapter-rxjava2:$RETROFIT_VERSION") {
+        exclude group: 'io.reactivex.java2', module: 'rxjava'
+    }
+    compile "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
 
     // Android compat/support libraries
     compile "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
@@ -46,11 +90,21 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:support-v4:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:support-annotations:$SUPPORT_LIBRARY_VERSION"
-    compile "com.android.support:support-v4:$SUPPORT_LIBRARY_VERSION"
+    compile "com.android.support.constraint:constraint-layout:$CONSTRAINT_LAYOUT_VERSION"
 
-    // See project level build.gradle for Realm plugin
-    // Realm recycler view
-    compile 'io.realm:android-adapters:1.4.0'
+    // Speech To Text
+    // Using API calls instead
+    compile 'com.google.cloud:google-cloud-speech:0.22.0-alpha'
+
+    // Convert to convert 3gp audio to flac - https://github.com/adrielcafe/AndroidAudioConverter
+    compile 'com.github.adrielcafe:AndroidAudioConverter:0.0.8'
+
+    //RxJava
+    compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.1'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
+    // For debugging/com.google.common.io.BaseEncoding
+     //compile 'com.google.guava:guava:22.0-android'
 
     // For Dagger2
     compile "com.google.dagger:dagger:$DAGGER_VERSION"
@@ -60,13 +114,48 @@ dependencies {
     compile "com.google.dagger:dagger-android-support:$DAGGER_VERSION"
     provided "javax.annotation:jsr250-api:$JSR250_VERSION"
 
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    // See project level build.gradle for Realm plugin
+    // For Realm recyclerView adapter
+    compile  'io.realm:android-adapters:1.4.0'
+
+    // Authenticate using Google sign-in - note firebase is needed even if not using firebase api's
+    compile "com.google.android.gms:play-services-auth:$FIREBASE_VERSION"
+    // Google Api Client library and Android extension
+    compile "com.google.api-client:google-api-client:$GOOGLE_API_CLIENT"
+    compile "com.google.api-client:google-api-client-android:$GOOGLE_API_CLIENT"
+    // Needed Firebase auth to be able to sign in and get OAuth2 token
+     compile "com.google.firebase:firebase-auth:$FIREBASE_VERSION"
+    // Upload/download files to google/firebase cloud storage
+    // (Although was able to upload files via gcs apii, for the life of me I couldn't delete the file via gcs api
+    // So using firebase storage for upload/delete
+    compile "com.google.firebase:firebase-storage:$FIREBASE_VERSION"
+
+    // Mulitdex - built in for Android 5.0 and higher
+    //compile 'com.android.support:multidex:1.0.1'
+
+    androidTestCompile("com.android.support.test.espresso:espresso-core:$ESPRESSO_CORE_VERSION", {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
     })
 
-
-
-    testCompile 'junit:junit:4.12'
+    testCompile "junit:junit:$JUNIT4_VERSION"
 
 }
+
+
+buildscript {
+    repositories {
+        mavenCentral() // or jcenter()
+    }
+
+    dependencies {
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.7.3'
+
+    }
+}
+
+// Process the google-services.json
+apply plugin: 'com.google.gms.google-services'
+
+// make sure this line comes *after* you apply the Android plugin
+apply plugin: 'com.getkeepsafe.dexcount'

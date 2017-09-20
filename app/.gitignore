@@ -11,4 +11,8 @@
 gradle/
 gradlew
 gradlew.bat
+debug/
+release/
+
+google-services.json
 

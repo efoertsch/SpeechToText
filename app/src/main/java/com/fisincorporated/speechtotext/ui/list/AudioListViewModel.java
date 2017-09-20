@@ -11,7 +11,6 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 
 import com.fisincorporated.speechtotext.R;
-import com.fisincorporated.speechtotext.audio.DividerItemDecoration;
 import com.fisincorporated.speechtotext.audio.PlayAudioCallback;
 import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
@@ -44,6 +43,7 @@ public class AudioListViewModel extends AudioBaseViewModel implements PlayAudioC
     public AudioListViewModel(Context context, AudioListAdapter audioListAdapter, AudioRecordUtils audioRecordUtils) {
         this.context = context;
         this.audioListAdapter = audioListAdapter;
+        this.audioRecordUtils = audioRecordUtils;
         audioListAdapter.setPlayAudioCallback(this);
     }
 
@@ -68,7 +68,6 @@ public class AudioListViewModel extends AudioBaseViewModel implements PlayAudioC
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(audioListAdapter);
         recyclerView.setHasFixedSize(true);
-        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL_LIST));
         TouchHelperCallback touchHelperCallback = new TouchHelperCallback();
         ItemTouchHelper touchHelper = new ItemTouchHelper(touchHelperCallback);
         touchHelper.attachToRecyclerView(recyclerView);
@@ -95,7 +94,7 @@ public class AudioListViewModel extends AudioBaseViewModel implements PlayAudioC
 
         @Override
         public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
-            audioRecordUtils.deleteItemAsync(realm, viewHolder.getItemId());
+            audioRecordUtils.deleteAudioRecordByIdAsync(viewHolder.getItemId());
         }
 
         @Override

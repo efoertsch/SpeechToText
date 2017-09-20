@@ -17,6 +17,8 @@ public class AudioPlaybackActivity extends AudioBaseActivity {
 
     public static final String AUDIO_ID = "AUDIO_ID";
 
+    public boolean firstTime = true;
+
     @Inject
     public AudioPlaybackViewModel viewModel;
 
@@ -35,7 +37,15 @@ public class AudioPlaybackActivity extends AudioBaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        viewModel.playAudio(getIntent().getLongExtra(AUDIO_ID, 0));
+        if (firstTime) {
+            viewModel.playAudio(getIntent().getLongExtra(AUDIO_ID, 0));
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        viewModel.onPause();
     }
 
     @Override

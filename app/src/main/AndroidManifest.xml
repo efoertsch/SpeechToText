@@ -3,6 +3,8 @@
           package="com.fisincorporated.speechtotext">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:name=".application.AudioApplication"
@@ -24,15 +26,27 @@
         </activity>
         <activity
             android:name=".ui.record.AudioRecordActivity"
-            android:screenOrientation="portrait"
-           >
+            android:screenOrientation="portrait">
         </activity>
 
         <activity
             android:name=".ui.playback.AudioPlaybackActivity"
-            android:screenOrientation="portrait"
-            >
+            android:screenOrientation="portrait">
         </activity>
+
+        <activity
+            android:name=".ui.signin.SignInActivity"
+            android:screenOrientation="portrait"
+            android:exported="true">
+        </activity>
+
+        <service
+            android:name=".jobscheduler.TranslationJobService"
+            android:label="For audio to text translation"
+            android:permission="android.permission.BIND_JOB_SERVICE" >
+
+        </service>
+
     </application>
 
 </manifest>

@@ -3,6 +3,7 @@ package com.fisincorporated.speechtotext.ui.record;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -13,9 +14,12 @@ import com.fisincorporated.speechtotext.R;
 import com.fisincorporated.speechtotext.audio.AudioService;
 import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
+import com.fisincorporated.speechtotext.audio.utils.SpeechToTextConversionData;
 import com.fisincorporated.speechtotext.databinding.AudioDescriptionInputBinding;
 import com.fisincorporated.speechtotext.databinding.AudioRecordBinding;
 import com.fisincorporated.speechtotext.ui.AudioBaseViewModel;
+import com.fisincorporated.speechtotext.ui.signin.SignInActivity;
+import com.google.gson.Gson;
 
 import java.util.Date;
 import java.util.UUID;
@@ -27,8 +31,6 @@ public class AudioRecordViewModel extends AudioBaseViewModel implements Finished
     private Context context;
 
     private AudioRecord audioRecord;
-
-    private AudioRecordBinding viewDataBinding;
 
     private AudioService audioService;
 
@@ -46,7 +48,7 @@ public class AudioRecordViewModel extends AudioBaseViewModel implements Finished
 
     public AudioRecordViewModel setView(View view) {
         View bindingView = view.findViewById(R.id.activity_record_layout);
-        viewDataBinding = DataBindingUtil.bind(bindingView);
+        AudioRecordBinding viewDataBinding = DataBindingUtil.bind(bindingView);
         viewDataBinding.setViewmodel(this);
 
         View microphoneLayout = viewDataBinding.activityAudioRecordMicrophoneLayout;
@@ -89,12 +91,12 @@ public class AudioRecordViewModel extends AudioBaseViewModel implements Finished
                     String description = userInputDialogEditText.getText().toString();
                     audioRecordUtils.saveDescriptionWithAudio(audioRecord, description);
                     dialogBox.dismiss();
+                    signInForTranslation(audioRecord);
                     finish();
-
                 })
                 .setNegativeButton(R.string.cancel_delete_audio,
                         (dialogBox, id) -> {
-                            // deleteAudio();
+                            deleteAudio();
                             dialogBox.dismiss();
                             finish();
                         });
@@ -103,6 +105,21 @@ public class AudioRecordViewModel extends AudioBaseViewModel implements Finished
         alertDialogAndroid.setCanceledOnTouchOutside(false);
         alertDialogAndroid.show();
 
+    }
+
+    private void signInForTranslation(AudioRecord audioRecord) {
+
+        SpeechToTextConversionData speechToTextConversionData = new SpeechToTextConversionData(audioRecord.getId(), audioRecordUtils.getAudioDirectoryPath(), audioRecord.getAudioFileName());
+        Gson gson = new Gson();
+        String jsonData = gson.toJson(speechToTextConversionData);
+
+        Intent intent = new Intent(context, SignInActivity.class);
+        intent.putExtra(SpeechToTextConversionData.SPEECH_TO_TEXT_CONVERSION_DATA, jsonData);
+        context.startActivity(intent);
+    }
+
+    private void deleteAudio() {
+        audioRecordUtils.deleteAudioRecord(audioRecord);
     }
 
     private void finish() {
