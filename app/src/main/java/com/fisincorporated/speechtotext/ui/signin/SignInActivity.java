@@ -18,7 +18,7 @@ import com.fisincorporated.speechtotext.R;
 import com.fisincorporated.speechtotext.audio.utils.SpeechToTextConversionData;
 import com.fisincorporated.speechtotext.audio.utils.SpeechToTextService;
 import com.fisincorporated.speechtotext.jobscheduler.JobSchedulerUtil;
-import com.fisincorporated.speechtotext.utils.TokenStorage;
+import com.fisincorporated.speechtotext.application.TokenStorage;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;

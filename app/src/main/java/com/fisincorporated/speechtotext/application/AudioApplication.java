@@ -45,7 +45,6 @@ public class AudioApplication extends Application
         RealmConfiguration realmConfig = new RealmConfiguration.Builder()
                 .name("audio.files")
                 .schemaVersion(0)
-                //.migration(new AudioRecordMigration())
                 .initialData(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
@@ -53,7 +52,6 @@ public class AudioApplication extends Application
                     }
                 })
                 .build();
-        //Realm.deleteRealm(realmConfig); // Delete Realm between app restarts.
         Realm.setDefaultConfiguration(realmConfig);
         Realm realm = Realm.getDefaultInstance();
         long count = realm.where(AudioRecord.class).count();

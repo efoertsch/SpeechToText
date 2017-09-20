@@ -1,4 +1,4 @@
-package com.fisincorporated.speechtotext.utils;
+package com.fisincorporated.speechtotext.application;
 
 
 
@@ -15,7 +15,7 @@ public class TokenStorage {
     private static final String TOKEN_DATA = "TOKEN_DATA";
 
     public static String getToken(Context context) {
-        SharedPreferences tokenDataPrefs = context.getSharedPreferences(TOKEN_DATA, Context.MODE_PRIVATE);
+        SharedPreferences tokenDataPrefs = context.getSharedPreferences(TOKEN_DATA_PREFS, Context.MODE_PRIVATE);
         String tokenDataJson = tokenDataPrefs.getString(TOKEN_DATA, null);
         if (tokenDataJson == null) {
             return null;
@@ -30,7 +30,7 @@ public class TokenStorage {
     }
 
     public static void storeToken(Context context, String token ) {
-        SharedPreferences tokenDataPrefs = context.getSharedPreferences(TOKEN_DATA, Context.MODE_PRIVATE);
+        SharedPreferences tokenDataPrefs = context.getSharedPreferences(TOKEN_DATA_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = tokenDataPrefs.edit();
         if (token == null) {
             editor.putString(TOKEN_DATA, null);
@@ -41,6 +41,4 @@ public class TokenStorage {
         }
         editor.apply();
     }
-
-
 }

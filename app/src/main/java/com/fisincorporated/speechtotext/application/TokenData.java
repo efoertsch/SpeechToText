@@ -1,4 +1,4 @@
-package com.fisincorporated.speechtotext.utils;
+package com.fisincorporated.speechtotext.application;
 
 
 import com.google.gson.annotations.Expose;
