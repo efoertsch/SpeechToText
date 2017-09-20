@@ -1,12 +1,21 @@
 package com.fisincorporated.speechtotext.jobscheduler;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.content.Context;
+import android.content.Intent;
 import android.os.PersistableBundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
+import com.fisincorporated.speechtotext.R;
 import com.fisincorporated.speechtotext.audio.utils.SpeechToTextConversionData;
 import com.fisincorporated.speechtotext.audio.utils.SpeechToTextService;
+import com.fisincorporated.speechtotext.ui.playback.AudioPlaybackActivity;
+import com.fisincorporated.speechtotext.utils.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -40,7 +49,7 @@ public class TranslationJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
 
-       // AndroidInjection.inject(this);
+        // AndroidInjection.inject(this);
         speechToTextService = new SpeechToTextService(this);
         Log.d(TAG, "onStartJob called");
         return startSpeechToTextTranslation(params);
@@ -88,31 +97,32 @@ public class TranslationJobService extends JobService {
     public boolean startSpeechToTextTranslation(JobParameters params) {
 
         SpeechToTextConversionData speechToTextConversionData = getConversionData(params);
-        if (speechToTextConversionData != null) {
 
-          //  StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        if (speechToTextConversionData != null) {
+            postNotification(speechToTextConversionData);
+
             Observable<SpeechToTextConversionData> observable = speechToTextService.getSpeechToTextObservable(speechToTextConversionData);
 
             DisposableObserver<SpeechToTextConversionData> observer = new DisposableObserver<SpeechToTextConversionData>() {
 
                 @Override
                 public void onError(Throwable e) {
-                    //TODO Put out notification of error
-                    speechToTextConversionData.incrementTranslationAttempts();
-                    if (speechToTextConversionData.getTranslationAttempts() < 2) {
-                        //TODO Put out notification of error and restart
-                        jobFinished(params, true);
-                    } else {
-                        //TODO Put out notification of error and stopping translation
-                        jobFinished(params, false);
-                    }
+                    //TODO implement reattempt
+                    jobFinished(params, false);
+//                    speechToTextConversionData.incrementTranslationAttempts();
+//                    //if (speechToTextConversionData.getTranslationAttempts() < 2) {
+//                        jobFinished(params, true);
+//                    } else {
+//                        jobFinished(params, false);
+//                    }
                     this.dispose();
+                    postNotification(speechToTextConversionData);
                     Log.e(TAG, e.toString());
                 }
 
                 @Override
                 public void onComplete() {
-                    //TODO Put out notification of error
+                    postNotification(speechToTextConversionData);
                     jobCompleted(params, false);
                     Log.e(TAG, "Translation completed");
                     this.dispose();
@@ -133,6 +143,50 @@ public class TranslationJobService extends JobService {
         Log.d(TAG, "Job started but missing SpeechToTextData!");
         return true;
 
+    }
+
+    public void postNotification(SpeechToTextConversionData speechToTextConversionData) {
+        String contentText;
+        if (StringUtils.isNotEmpty(speechToTextConversionData.getAudioText())) {
+            contentText = getString(R.string.speech_to_text_converstion_complete, speechToTextConversionData.getAudioDescripton());
+        } else if (speechToTextConversionData.getException() != null) {
+            contentText = getString(R.string.oops_an_error_has_occurred, speechToTextConversionData.getAudioDescripton(), speechToTextConversionData.getException().toString());
+
+        } else {
+            contentText = getString(R.string.text_to_speech_conversion_proceeding, speechToTextConversionData.getAudioDescripton());
+        }
+        postNotification(speechToTextConversionData, contentText);
+    }
+
+    public void postNotification(SpeechToTextConversionData speechToTextConversionData, String notificationContent) {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_notification_info)
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentText(notificationContent);
+        // Creates an explicit intent for an Activity in your app
+        Intent intent = new Intent(this, AudioPlaybackActivity.class);
+        intent.putExtra(AudioPlaybackActivity.AUDIO_ID, speechToTextConversionData.getAudioRecordRealmId());
+
+        // The stack builder object will contain an artificial back stack for the started Activity.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(AudioPlaybackActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(intent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // mNotificationId is a unique integer your app uses to identify the
+        // notification. For example, to cancel the notification, you can pass its ID
+        // number to NotificationManager.cancel().
+        mNotificationManager.notify((int) speechToTextConversionData.getAudioRecordRealmId(), mBuilder.build());
     }
 
 }

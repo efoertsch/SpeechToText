@@ -11,6 +11,10 @@ public class SpeechToTextConversionData extends BaseJson {
 
     public static final String SPEECH_TO_TEXT_CONVERSION_DATA = "SPEECH_TO_TEXT_CONVERSION_DATA";
 
+    @SerializedName("audioDescripton")
+    @Expose
+    private String audioDescripton;
+
     @SerializedName("deviceAbsolutePathToAudioFile")
     @Expose
     private String deviceAbsolutePathToAudioFile = "";
@@ -26,10 +30,6 @@ public class SpeechToTextConversionData extends BaseJson {
     @SerializedName("flacConversionSuccess")
     @Expose
     private boolean flacConversionSuccess = false;
-
-    @SerializedName("signinToFirebaseSuccess")
-    @Expose
-    private boolean signinToFirebaseSuccess = false;
 
     @SerializedName("uploadToGcsSuccess")
     @Expose
@@ -71,10 +71,6 @@ public class SpeechToTextConversionData extends BaseJson {
     @Expose
     private String longRunningRecognizeError = "";
 
-    @SerializedName("longrunningrecognizetext")
-    @Expose
-    private String longRunningRecognizeText = "";
-
     @SerializedName("updateToRealmSuccess")
     @Expose
     private boolean updateToRealmSuccess;
@@ -89,11 +85,20 @@ public class SpeechToTextConversionData extends BaseJson {
 
     private SpeechToTextConversionData(){}
 
-    public SpeechToTextConversionData(long audioRecordRealmId, String deviceAbsolutePathToAudioFile, String audio3gpFileName){
+    public SpeechToTextConversionData(long audioRecordRealmId, String description, String deviceAbsolutePathToAudioFile, String audio3gpFileName){
         this.audioRecordRealmId = audioRecordRealmId;
+        this.audioDescripton = description;
         this.deviceAbsolutePathToAudioFile = deviceAbsolutePathToAudioFile;
         this.audio3gpFileName = audio3gpFileName;
     };
+
+    public String getAudioDescripton() {
+        return audioDescripton;
+    }
+
+    public void setAudioDescripton(String audioDescripton) {
+        this.audioDescripton = audioDescripton;
+    }
 
     public String getDeviceAbsolutePathToAudioFile() {
         return deviceAbsolutePathToAudioFile;
@@ -125,14 +130,6 @@ public class SpeechToTextConversionData extends BaseJson {
 
     public void setFlacConversionSuccess(boolean flacConversionSuccess) {
         this.flacConversionSuccess = flacConversionSuccess;
-    }
-
-    public boolean isSigninToFirebaseSuccess() {
-        return signinToFirebaseSuccess;
-    }
-
-    public void setSigninToFirebaseSuccess(boolean signinToFirebaseSuccess) {
-        this.signinToFirebaseSuccess = signinToFirebaseSuccess;
     }
 
     public boolean isUploadToGcsSuccess() {
@@ -208,13 +205,6 @@ public class SpeechToTextConversionData extends BaseJson {
         this.longRunningRecognizeError = longRunningRecognizeError;
     }
 
-    public boolean isUpdateToRealmSuccess() {
-        return updateToRealmSuccess;
-    }
-
-    public void setUpdateToRealmSuccess(boolean updateToRealmSuccess) {
-        this.updateToRealmSuccess = updateToRealmSuccess;
-    }
 
     public int getTranslationAttempts() {
         return translationAttempts;

@@ -113,7 +113,7 @@ public class SpeechToTextService {
         Observable<SpeechToTextConversionData> observable = Observable.create(new ObservableOnSubscribe<SpeechToTextConversionData>() {
             @Override
             public void subscribe(@io.reactivex.annotations.NonNull ObservableEmitter<SpeechToTextConversionData> emitter) throws Exception {
-                Log.d(TAG, " audio3GpToFlacObservable(. uploadFlacFileToFirebaseObservable. Current thread:" + Thread.currentThread());
+                //Log.d(TAG, " audio3GpToFlacObservable(. uploadFlacFileToFirebaseObservable. Current thread:" + Thread.currentThread());
                 File inputFile = new File(speechToTextConversionData.getAbsolute3gpFileName());
                 IConvertCallback callback = new IConvertCallback() {
                     @Override

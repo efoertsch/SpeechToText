@@ -32,6 +32,12 @@ public class AudioRecordUtils {
         realm = Realm.getDefaultInstance();
     }
 
+    public void closeRealm() {
+        if (!realm.isClosed()) {
+            realm.close();
+        }
+    }
+
     public OrderedRealmCollection<AudioRecord> getOrderedRealmCollection() {
         return realm.where(AudioRecord.class).notEqualTo(AudioRecord.FIELDS.id.name(), 0).findAllSorted(AudioRecord.FIELDS.id.name(), Sort.DESCENDING);
     }

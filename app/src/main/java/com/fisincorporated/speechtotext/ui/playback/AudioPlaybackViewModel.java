@@ -111,7 +111,7 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioR
     private void startSpeechToTextTranslation(String filename) {
         //return speechToTextService.startSpeechToTextTranslation(audioRecordUtils.getAbsoluteFileName(filename), filename);
 
-        SpeechToTextConversionData speechToTextConversionData = new SpeechToTextConversionData(audioRecord.getId(), audioRecordUtils.getAudioDirectoryPath(), filename);
+        SpeechToTextConversionData speechToTextConversionData = new SpeechToTextConversionData(audioRecord.getId(), audioRecord.getDescription(), audioRecordUtils.getAudioDirectoryPath(), filename);
         Observable<SpeechToTextConversionData> observable = speechToTextService.getSpeechToTextObservable(speechToTextConversionData);
 
         DisposableObserver<SpeechToTextConversionData> observer = new DisposableObserver<SpeechToTextConversionData>() {
