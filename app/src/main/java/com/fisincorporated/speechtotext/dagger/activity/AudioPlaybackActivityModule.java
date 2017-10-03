@@ -22,11 +22,4 @@ public class AudioPlaybackActivityModule {
         return new AudioPlaybackViewModel(activity, audioService, audioRecordUtils, speechToTextService);
     }
 
-    @Provides
-    public SpeechToTextService providesSpeechToTextService(AudioPlaybackActivity activity) {
-        return new SpeechToTextService(activity);
-    }
-
-
-
 }

@@ -8,20 +8,15 @@ import android.util.Log;
 
 import com.fisincorporated.speechtotext.R;
 import com.fisincorporated.speechtotext.audio.data.AudioRecord;
-import com.fisincorporated.speechtotext.googlespeech.objectaccess.ObjectAccessList;
 import com.fisincorporated.speechtotext.googlespeech.speechrequest.LongRunningRecognize;
 import com.fisincorporated.speechtotext.googlespeech.speechresponse.Alternative;
 import com.fisincorporated.speechtotext.googlespeech.speechresponse.OperationResponse;
 import com.fisincorporated.speechtotext.googlespeech.speechresponse.Result;
 import com.fisincorporated.speechtotext.googlespeech.speechresponse.SpeechResponse;
-import com.fisincorporated.speechtotext.retrofit.GcsApi;
-import com.fisincorporated.speechtotext.retrofit.GcsRetrofit;
 import com.fisincorporated.speechtotext.retrofit.GoogleSpeechRetrofit;
 import com.fisincorporated.speechtotext.retrofit.GoogleSpeechServicesApi;
-import com.fisincorporated.speechtotext.retrofit.LoggingInterceptor;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.api.client.repackaged.org.apache.commons.codec.EncoderException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -40,15 +35,11 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-//TODO - Cleanup
 //TODO - modify to use injection
 public class SpeechToTextService {
 
@@ -56,22 +47,19 @@ public class SpeechToTextService {
 
     private Context context;
 
-    private Retrofit gcsRetrofit;
-
-    private Retrofit googleSpeechRetrofit;
+    private Retrofit retrofit;
 
     private AudioRecordUtils audioRecordUtils;
 
     private FirebaseStorage storage = FirebaseStorage.getInstance();
 
-
     @Inject
-    public SpeechToTextService(Context context) {
+    public SpeechToTextService(Context context, GoogleSpeechRetrofit googleSpeechRetrofit, AudioRecordUtils  audioRecordUtils) {
         // TODO inject
-        gcsRetrofit = new GcsRetrofit(new LoggingInterceptor()).getRetrofit();
-        googleSpeechRetrofit = new GoogleSpeechRetrofit(new LoggingInterceptor()).getRetrofit();
-        audioRecordUtils = new AudioRecordUtils(context);
-
+        this.retrofit = googleSpeechRetrofit.getRetrofit();
+        this.audioRecordUtils = audioRecordUtils;
+       // retrofit = new GoogleSpeechRetrofit(new LoggingInterceptor()).getRetrofit();
+       // audioRecordUtils = new AudioRecordUtils(context);
         this.context = context;
     }
 
@@ -80,7 +68,7 @@ public class SpeechToTextService {
      * 1. Convert 3gp to flac audio file
      * 2. Upload flac file to gcs
      * 3. Convert flac file to text
-     * TODO 4. Delete flac file on gcs and app device
+     * 4. Delete flac file on gcs and app device
      * 5. Update Realm object with text
      *
      * @param speechToTextConversionData
@@ -90,12 +78,9 @@ public class SpeechToTextService {
 
         Observable<SpeechToTextConversionData> observable = Observable.concatArray(
                 audio3GpToFlacObservable(speechToTextConversionData)
-                //, uploadFlacFileToGcsObservable(speechToTextConversionData)
                 , uploadFlacFileToFirebaseObservable(speechToTextConversionData)
                 , startLongRunningRecognizeObservable(speechToTextConversionData)
                 , startIntermittentCheckOnLongRunningObservable(speechToTextConversionData)
-                //, getGcsFileObjectAccessObservable(speechToTextConversionData)
-                //, deleteFileFromGCSObservable(speechToTextConversionData)
                 , deleteFlacFileFromFirebaseObservable(speechToTextConversionData)
                 , updateRealmObservable(speechToTextConversionData, context));
 
@@ -151,63 +136,6 @@ public class SpeechToTextService {
         });
         return observable;
     }
-
-    Observable<SpeechToTextConversionData> uploadFlacFileToGcsObservable(SpeechToTextConversionData speechToTextConversionData) {
-        Observable<SpeechToTextConversionData> observable = Observable.create(new ObservableOnSubscribe<SpeechToTextConversionData>() {
-            @Override
-            public void subscribe(@io.reactivex.annotations.NonNull ObservableEmitter<SpeechToTextConversionData> emitter) throws Exception {
-                GcsApi client = gcsRetrofit.create(GcsApi.class);
-
-                // create RequestBody instance from file
-                RequestBody requestFile =
-                        RequestBody.create(MediaType.parse(speechToTextConversionData.getMimeType())
-                                , new File(speechToTextConversionData.getAbsoluteFlacFileName()));
-
-                // MultipartBody.Part is used to send also the actual file name
-                MultipartBody.Part body =
-                        MultipartBody.Part.create(requestFile);
-
-                Call<OperationResponse> call = client.uploadToGcs(
-                         context.getString(R.string.gcs_bucket)
-                        , context.getString(R.string.oauth2_bearer) + speechToTextConversionData.getOauth2Token()
-                        , requestFile.contentType().toString()
-                        , body
-                        , speechToTextConversionData.getAudioFlacFileName());
-
-                call.enqueue(new Callback<OperationResponse>() {
-                    @Override
-                    public void onResponse(Call<OperationResponse> call,
-                                           Response<OperationResponse> response) {
-                        if (response.code() == 200) {
-                            // TODO set speechToTextConversionData to successful upload
-                            //TODO delete flac file on device
-                            audioRecordUtils.deleteAudioFile(speechToTextConversionData.getAudioFlacFileName());
-                            speechToTextConversionData.setUploadToGcsSuccess(true);
-                            speechToTextConversionData.setGcsAudioFileName(response.body().getName());
-                            emitter.onNext(speechToTextConversionData);
-                            emitter.onComplete();
-                            Log.d(TAG, "success");
-                        } else {
-                            Log.d(TAG, "unsuccessful");
-                            speechToTextConversionData.setUploadToGcsSuccess(false);
-                            speechToTextConversionData.setException(new EncoderException(response.toString()));
-                            emitter.onError(new Exception(response.toString()));
-                        }
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<OperationResponse> call, Throwable t) {
-                        speechToTextConversionData.setUploadToGcsSuccess(false);
-                        emitter.onError(t);
-                        Log.e("Upload error:", t.getMessage());
-                    }
-                });
-            }
-        });
-        return observable;
-    }
-
 
     public Observable<SpeechToTextConversionData> uploadFlacFileToFirebaseObservable(SpeechToTextConversionData speechToTextConversionData) {
         Observable<SpeechToTextConversionData> observable = Observable.create(new ObservableOnSubscribe<SpeechToTextConversionData>() {
@@ -366,7 +294,7 @@ public class SpeechToTextService {
     }
 
     private GoogleSpeechServicesApi getGoogleSpeechServicesApi() {
-        return googleSpeechRetrofit.create(GoogleSpeechServicesApi.class);
+        return retrofit.create(GoogleSpeechServicesApi.class);
     }
 
     private String getTranslatedText(SpeechResponse response) {
@@ -390,43 +318,6 @@ public class SpeechToTextService {
             }
         }
         return sb.toString();
-    }
-
-    Observable<SpeechToTextConversionData> deleteFileFromGCSObservable(SpeechToTextConversionData speechToTextConversionData) {
-        Observable<SpeechToTextConversionData> observable = Observable.create(new ObservableOnSubscribe<SpeechToTextConversionData>() {
-            @Override
-            public void subscribe(@io.reactivex.annotations.NonNull ObservableEmitter<SpeechToTextConversionData> emitter) throws Exception {
-                GcsApi gcsClient = gcsRetrofit.create(GcsApi.class);
-                Call<OperationResponse> call = gcsClient.deleteFromGcs(context.getString(R.string.gcs_bucket)
-                        ,speechToTextConversionData.getAudioFlacFileName()
-                        ,speechToTextConversionData.getOauth2Token());
-
-                call.enqueue(new Callback<OperationResponse>() {
-                    @Override
-                    public void onResponse(Call<OperationResponse> call,
-                                           Response<OperationResponse> response) {
-                        if (response.code() == 204) {
-                            // 204 is no content
-                            Log.d(TAG, "success");
-                        } else {
-                            //TODO add
-                            Log.d(TAG, "unsuccessful");
-                             //TODO keep process going but send out notification(?) that files not being deleted on gcs
-                        }
-                        emitter.onComplete();
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<OperationResponse> call, Throwable t) {
-                        //TODO keep process going but send out notification(?) that files not being deleted on gcs
-                        Log.e("Upload error:", t.getMessage());
-                        emitter.onComplete();
-                    }
-                });
-            }
-        });
-        return observable;
     }
 
 
@@ -480,50 +371,6 @@ public class SpeechToTextService {
         });
         return observable;
     }
-
-
-
-    /**
-     * For debugging access authority
-     * @param speechToTextConversionData
-     * @return
-     */
-    Observable<SpeechToTextConversionData> getGcsFileObjectAccessObservable(SpeechToTextConversionData speechToTextConversionData) {
-        Observable<SpeechToTextConversionData> observable = Observable.create(new ObservableOnSubscribe<SpeechToTextConversionData>() {
-            @Override
-            public void subscribe(@io.reactivex.annotations.NonNull ObservableEmitter<SpeechToTextConversionData> emitter) throws Exception {
-                GcsApi gcsClient = gcsRetrofit.create(GcsApi.class);
-                Call<ObjectAccessList> call = gcsClient.getGcsObjectAccessList(context.getString(R.string.gcs_bucket)
-                        ,speechToTextConversionData.getAudioFlacFileName()
-                , speechToTextConversionData.getOauth2Token());
-
-                call.enqueue(new Callback<ObjectAccessList>() {
-                    @Override
-                    public void onResponse(Call<ObjectAccessList> call,
-                                           Response<ObjectAccessList> response) {
-                        if (response.code() == 200) {
-                            // 200 got list
-                            Log.d(TAG, "success" + response.body().getObjectAccessList().toString());
-                        } else {
-                             //TODO for debug
-                            Log.d(TAG, "unsuccessful");
-                        }
-                        emitter.onComplete();
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<ObjectAccessList> call, Throwable t) {
-                        //TODO keep process going but send out notification(?) that files not being deleted on gcs
-                        Log.e("ObjectAccessList error:", t.getMessage());
-                        emitter.onComplete();
-                    }
-                });
-            }
-        });
-        return observable;
-    }
-
 
 
 }
