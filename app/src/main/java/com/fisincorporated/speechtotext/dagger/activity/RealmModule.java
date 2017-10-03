@@ -1,8 +1,6 @@
 package com.fisincorporated.speechtotext.dagger.activity;
 
 
-import com.fisincorporated.speechtotext.dagger.annotations.PerActivity;
-
 import dagger.Module;
 import dagger.Provides;
 import io.realm.Realm;
@@ -11,7 +9,6 @@ import io.realm.Realm;
 @Module
 public class RealmModule {
 
-    @PerActivity
     @Provides
     Realm provideRealm() {
         return Realm.getDefaultInstance();

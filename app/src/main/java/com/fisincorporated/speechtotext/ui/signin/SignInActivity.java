@@ -2,7 +2,6 @@ package com.fisincorporated.speechtotext.ui.signin;
 
 import android.accounts.Account;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,10 +14,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fisincorporated.speechtotext.R;
-import com.fisincorporated.speechtotext.audio.utils.SpeechToTextConversionData;
-import com.fisincorporated.speechtotext.audio.utils.SpeechToTextService;
-import com.fisincorporated.speechtotext.jobscheduler.JobSchedulerUtil;
 import com.fisincorporated.speechtotext.application.TokenStorage;
+import com.fisincorporated.speechtotext.audio.utils.SpeechToTextConversionData;
+import com.fisincorporated.speechtotext.jobscheduler.JobSchedulerUtil;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -28,15 +26,10 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -65,10 +58,7 @@ public class SignInActivity extends AppCompatActivity implements
     private static final int RC_SIGN_IN = 9001;
     private static final int RC_RECOVERABLE = 9002;
 
-    public static final String AUDIO_RECORD = "AUDIO_RECORD";
-
     private FirebaseAuth mAuth;
-    private GoogleSignInAccount googleSignInAccount;
 
     private GoogleApiClient mGoogleApiClient;
     private TextView mStatusTextView;
@@ -78,7 +68,7 @@ public class SignInActivity extends AppCompatActivity implements
     private SpeechToTextConversionData speechToTextConversionData;
 
     @Inject
-    public SpeechToTextService speechToTextService;
+    public JobSchedulerUtil jobSchedulerUtil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,8 +197,7 @@ public class SignInActivity extends AppCompatActivity implements
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
                 // Google Sign In was successful, authenticate with Firebase
-                googleSignInAccount = result.getSignInAccount();
-                firebaseAuthWithGoogle(googleSignInAccount);
+                firebaseAuthWithGoogle(result.getSignInAccount());
             } else {
                 // Google Sign In failed, update UI appropriately
                 updateUI(null);
@@ -223,27 +212,24 @@ public class SignInActivity extends AppCompatActivity implements
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
-                            new Oauth2TokenTask().execute(acct.getAccount());
-                            //shouldStartSpeechToTextConverstion(user.getIdToken(true));
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            displaySignOnErrorDialog(getString(R.string.firebase_signin_unsuccessful));
-                            updateUI(null);
-                        }
-
-                        // [START_EXCLUDE]
-                        hideProgressDialog();
-                        // [END_EXCLUDE]
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "signInWithCredential:success");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        updateUI(user);
+                        new Oauth2TokenTask().execute(acct.getAccount());
+                        //shouldStartSpeechToTextConverstion(user.getIdToken(true));
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "signInWithCredential:failure", task.getException());
+                        displaySignOnErrorDialog(getString(R.string.firebase_signin_unsuccessful));
+                        updateUI(null);
                     }
+
+                    // [START_EXCLUDE]
+                    hideProgressDialog();
+                    // [END_EXCLUDE]
                 });
     }
 
@@ -253,26 +239,7 @@ public class SignInActivity extends AppCompatActivity implements
 
         // Google sign out
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(@NonNull Status status) {
-                        updateUI(null);
-                    }
-                });
-    }
-
-    private void revokeAccess() {
-        // Firebase sign out
-        mAuth.signOut();
-
-        // Google revoke access
-        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(@NonNull Status status) {
-                        updateUI(null);
-                    }
-                });
+                status -> updateUI(null));
     }
 
     private void updateUI(FirebaseUser user) {
@@ -291,19 +258,6 @@ public class SignInActivity extends AppCompatActivity implements
             findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
         }
     }
-
-    private void updateUI(boolean signedIn) {
-        if (signedIn) {
-            findViewById(R.id.sign_in_button).setVisibility(View.GONE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
-        } else {
-            mStatusTextView.setText(R.string.signed_out);
-
-            findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
-        }
-    }
-
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -361,8 +315,7 @@ public class SignInActivity extends AppCompatActivity implements
                         SignInActivity.this,
                         Collections.singleton("https://www.googleapis.com/auth/cloud-platform"));
                 credential.setSelectedAccount(params[0]);
-                String oauth2Token = credential.getToken();
-                return oauth2Token;
+                return credential.getToken();
             } catch (UserRecoverableAuthIOException userRecoverableException) {
                 Log.w(TAG, "UserRecoverableAuthIOException", userRecoverableException);
                 startActivityForResult(userRecoverableException.getIntent(), RC_RECOVERABLE);
@@ -392,7 +345,7 @@ public class SignInActivity extends AppCompatActivity implements
 
     private void createJobSchedulerJob(SpeechToTextConversionData speechToTextConversionData, String token) {
         speechToTextConversionData.setOauth2Token(token);
-        JobSchedulerUtil.scheduleXlatJob(this, speechToTextConversionData);
+        jobSchedulerUtil.scheduleXlatJob(this, speechToTextConversionData);
     }
 
     private void displaySignOnErrorDialog(String errorMsg) {
@@ -403,18 +356,14 @@ public class SignInActivity extends AppCompatActivity implements
         builder.setMessage(errorMsg)
                 .setTitle(R.string.signOnError);
 
-        builder.setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                signOnErrorDialog.dismiss();
-                signOut();
-                signIn();
-            }
+        builder.setPositiveButton(R.string.retry, (dialog, id) -> {
+            signOnErrorDialog.dismiss();
+            signOut();
+            signIn();
         });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                signOnErrorDialog.dismiss();
-                finish();
-            }
+        builder.setNegativeButton(R.string.cancel, (dialog, id) -> {
+            signOnErrorDialog.dismiss();
+            finish();
         });
 
         // 3. Get the AlertDialog from create()

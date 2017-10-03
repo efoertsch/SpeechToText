@@ -14,12 +14,17 @@ import android.util.Log;
 import com.fisincorporated.speechtotext.audio.utils.SpeechToTextConversionData;
 import com.google.gson.Gson;
 
+import javax.inject.Inject;
+
 public class JobSchedulerUtil {
 
     private static final String TAG = JobSchedulerUtil.class.getSimpleName();
 
+    @Inject
+    public JobSchedulerUtil(){}
+
     // schedule the job.
-    public static void scheduleXlatJob(Context context, SpeechToTextConversionData speechToTextConversionData) {
+    public void scheduleXlatJob(Context context, SpeechToTextConversionData speechToTextConversionData) {
         int rc = 0;
         ComponentName serviceComponent = new ComponentName(context, TranslationJobService.class);
         JobInfo.Builder builder = new JobInfo.Builder(0, serviceComponent);
@@ -37,7 +42,6 @@ public class JobSchedulerUtil {
         //builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED); // require unmetered network
         //builder.setRequiresDeviceIdle(true); // device should be idle
         //builder.setRequiresCharging(false); // we don't care if the device is charging or not
-        //TODO uncomment after initial testing
         //builder.setPersisted(true);  // persist job over reboot
         JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 

@@ -14,6 +14,8 @@ import android.util.Log;
 import com.fisincorporated.speechtotext.R;
 import com.fisincorporated.speechtotext.audio.utils.SpeechToTextConversionData;
 import com.fisincorporated.speechtotext.audio.utils.SpeechToTextService;
+import com.fisincorporated.speechtotext.dagger.service.DaggerTranslationJobServiceComponent;
+import com.fisincorporated.speechtotext.dagger.service.TranslationJobServiceModule;
 import com.fisincorporated.speechtotext.ui.playback.AudioPlaybackActivity;
 import com.fisincorporated.speechtotext.utils.StringUtils;
 import com.google.gson.Gson;
@@ -49,10 +51,18 @@ public class TranslationJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
 
-        // AndroidInjection.inject(this);
-        speechToTextService = new SpeechToTextService(this);
+        doInjection();
+        //speechToTextService = new SpeechToTextService(this);
         Log.d(TAG, "onStartJob called");
         return startSpeechToTextTranslation(params);
+
+    }
+
+    private void doInjection() {
+        DaggerTranslationJobServiceComponent.builder()
+                .translationJobServiceModule(new TranslationJobServiceModule(this))
+                .build()
+                .inject(this);
 
     }
 
@@ -107,7 +117,7 @@ public class TranslationJobService extends JobService {
 
                 @Override
                 public void onError(Throwable e) {
-                    //TODO implement reattempt
+                    //TODO implement reattempt better than that below
                     jobFinished(params, false);
 //                    speechToTextConversionData.incrementTranslationAttempts();
 //                    //if (speechToTextConversionData.getTranslationAttempts() < 2) {

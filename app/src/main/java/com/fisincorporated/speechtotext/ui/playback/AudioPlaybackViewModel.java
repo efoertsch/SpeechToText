@@ -17,14 +17,11 @@ import com.fisincorporated.speechtotext.databinding.AudioPlaybackBinding;
 import com.fisincorporated.speechtotext.ui.AudioBaseViewModel;
 import com.fisincorporated.speechtotext.ui.MediaPlayerAndController;
 import com.fisincorporated.speechtotext.ui.signin.SignInActivity;
+import com.google.gson.Gson;
 
 import javax.inject.Inject;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 
 public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioRecord.ChangeListener {
     private static final String TAG = AudioPlaybackViewModel.class.getSimpleName();
@@ -48,11 +45,6 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioR
     private MediaPlayerAndController mediaPlayerAndController;
 
     private final CompositeDisposable disposables = new CompositeDisposable();
-
-//    private FirebaseAuth firebaseAuth;
-//
-//    private FirebaseUser currentUser;
-
 
     @Inject
     public AudioPlaybackViewModel(Context context, AudioService audioService, AudioRecordUtils audioRecordUtils, SpeechToTextService speechToTextService) {
@@ -103,39 +95,13 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioR
     }
 
     public void translateToText() {
+        SpeechToTextConversionData speechToTextConversionData = new SpeechToTextConversionData(audioRecord.getId(), audioRecord.getDescription(), audioRecordUtils.getAudioDirectoryPath(), audioRecord.getAudioFileName());
+        Gson gson = new Gson();
+        String jsonData = gson.toJson(speechToTextConversionData);
+
         Intent intent = new Intent(context, SignInActivity.class);
+        intent.putExtra(SpeechToTextConversionData.SPEECH_TO_TEXT_CONVERSION_DATA, jsonData);
         context.startActivity(intent);
-    }
-
-
-    private void startSpeechToTextTranslation(String filename) {
-        //return speechToTextService.startSpeechToTextTranslation(audioRecordUtils.getAbsoluteFileName(filename), filename);
-
-        SpeechToTextConversionData speechToTextConversionData = new SpeechToTextConversionData(audioRecord.getId(), audioRecord.getDescription(), audioRecordUtils.getAudioDirectoryPath(), filename);
-        Observable<SpeechToTextConversionData> observable = speechToTextService.getSpeechToTextObservable(speechToTextConversionData);
-
-        DisposableObserver<SpeechToTextConversionData> observer = new DisposableObserver<SpeechToTextConversionData>() {
-
-            @Override
-            public void onError(Throwable e) {
-                System.out.println(e.toString());
-            }
-
-            @Override
-            public void onComplete() {
-                System.out.println("onCompleted");
-            }
-
-
-            @Override
-            public void onNext(SpeechToTextConversionData speechToTextConversionData) {
-                System.out.println("onNext:" + speechToTextConversionData.toString());
-            }
-        };
-
-     disposables.add(observable.observeOn(AndroidSchedulers.mainThread()).
-              subscribeOn(Schedulers.io()).subscribeWith(observer));
-
 
     }
 

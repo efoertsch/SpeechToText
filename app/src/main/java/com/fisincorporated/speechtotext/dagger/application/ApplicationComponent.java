@@ -2,8 +2,8 @@ package com.fisincorporated.speechtotext.dagger.application;
 
 
 import com.fisincorporated.speechtotext.application.AudioApplication;
-import com.fisincorporated.speechtotext.audio.AudioService;
-import com.fisincorporated.speechtotext.dagger.BuildersModule;
+import com.fisincorporated.speechtotext.dagger.activity.ActivityBuildersModule;
+import com.fisincorporated.speechtotext.dagger.io.RetrofitModule;
 
 import javax.inject.Singleton;
 
@@ -13,7 +13,7 @@ import dagger.android.AndroidInjectionModule;
 
 
 @Singleton
-@Component(modules = {BuildersModule.class, AndroidInjectionModule.class, ApplicationModule.class})
+@Component(modules = {ActivityBuildersModule.class, AndroidInjectionModule.class, ApplicationModule.class, RetrofitModule.class})
 public interface ApplicationComponent {
 
     @Component.Builder
@@ -24,8 +24,6 @@ public interface ApplicationComponent {
     }
 
     void inject(AudioApplication audioApplication);
-
-    AudioService getAudioService();
 
 }
 

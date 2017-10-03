@@ -2,6 +2,7 @@ package com.fisincorporated.speechtotext.application;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.Service;
 import android.util.Log;
 
 import com.fisincorporated.speechtotext.audio.data.AudioRecord;
@@ -14,16 +15,19 @@ import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
 import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasDispatchingActivityInjector;
+import dagger.android.HasDispatchingServiceInjector;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
-public class AudioApplication extends Application
-//public class AudioApplication extends Application
-        implements HasDispatchingActivityInjector {
+public class AudioApplication extends Application implements HasDispatchingActivityInjector, HasDispatchingServiceInjector {
     private static final String TAG = AudioApplication.class.getSimpleName();
 
     @Inject
     DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
+
+    @Inject
+    DispatchingAndroidInjector<Service> dispatchingAndroidJobServiceInjector;
+
 
     @Inject
     AudioRecordUtils audioRecordsUtils;
@@ -71,6 +75,11 @@ public class AudioApplication extends Application
         return dispatchingAndroidInjector;
     }
 
+    @Override
+    public DispatchingAndroidInjector<Service> serviceInjector() {
+        return dispatchingAndroidJobServiceInjector;
+    }
+
     private void loadAudioConverter() {
         AndroidAudioConverter.load(this, new ILoadCallback() {
             @Override
@@ -84,5 +93,6 @@ public class AudioApplication extends Application
             }
         });
     }
+
 
 }
