@@ -39,6 +39,7 @@ public class AudioPlaybackActivity extends AudioBaseActivity {
         super.onResume();
         if (firstTime) {
             viewModel.playAudio(getIntent().getLongExtra(AUDIO_ID, 0));
+            firstTime = false;
         }
     }
 

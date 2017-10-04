@@ -51,7 +51,8 @@ public class AudioListAdapter extends RealmRecyclerViewAdapter<AudioRecord, Audi
             });
         }
         holder.speechToTextView.setVisibility((audioRecord.getSpeechToTextTranslation() != null
-                            && !audioRecord.getSpeechToTextTranslation().isEmpty()) ? View.VISIBLE : View.GONE);
+                            && !audioRecord.getSpeechToTextTranslation().isEmpty()
+                            && !audioRecord.getSpeechToTextTranslation().equals("\n")) ?  View.VISIBLE : View.GONE);
 
     }
 
