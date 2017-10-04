@@ -43,7 +43,7 @@
             android:id="@+id/audio_controller_seekbar_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_toRightOf="@id/audio_controller_play_pause_layout"
+            android:layout_toRightOf="@+id/audio_controller_play_pause_layout"
             android:paddingBottom="5dp"
             android:paddingRight="5dp"
             android:paddingTop="5dp">

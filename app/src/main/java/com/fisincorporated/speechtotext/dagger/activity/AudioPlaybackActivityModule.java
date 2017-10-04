@@ -1,9 +1,7 @@
 package com.fisincorporated.speechtotext.dagger.activity;
 
 
-import com.fisincorporated.speechtotext.audio.AudioService;
 import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
-import com.fisincorporated.speechtotext.audio.utils.SpeechToTextService;
 import com.fisincorporated.speechtotext.dagger.annotations.PerActivity;
 import com.fisincorporated.speechtotext.ui.playback.AudioPlaybackActivity;
 import com.fisincorporated.speechtotext.ui.playback.AudioPlaybackViewModel;
@@ -18,8 +16,8 @@ import dagger.Provides;
 public class AudioPlaybackActivityModule {
 
     @Provides
-    public AudioPlaybackViewModel providesAudioPlaybackViewModel(AudioPlaybackActivity activity, @Singleton AudioService audioService, @Singleton AudioRecordUtils audioRecordUtils, @PerActivity SpeechToTextService speechToTextService) {
-        return new AudioPlaybackViewModel(activity, audioService, audioRecordUtils, speechToTextService);
+    public AudioPlaybackViewModel providesAudioPlaybackViewModel(AudioPlaybackActivity activity, @Singleton AudioRecordUtils audioRecordUtils) {
+        return new AudioPlaybackViewModel(activity, audioRecordUtils);
     }
 
 }

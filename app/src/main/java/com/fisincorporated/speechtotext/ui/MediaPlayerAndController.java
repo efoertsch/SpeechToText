@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 // cribbed from https://github.com/jaydeepw/audio-wife then modified into view
 
-public class MediaPlayerAndController extends LinearLayout implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener,
+public class MediaPlayerAndController extends LinearLayout implements MediaPlayer.OnPreparedListener,
         MediaPlayer.OnErrorListener {
 
     private static final String TAG = MediaPlayerAndController.class.getSimpleName();
@@ -120,7 +120,7 @@ public class MediaPlayerAndController extends LinearLayout implements MediaPlaye
         initMediaSeekBar();
 
         mediaPlayer.setOnPreparedListener(this);
-        mediaPlayer.setOnCompletionListener(this);
+        mediaPlayer.setOnCompletionListener(mOnCompletion);
 
         if (playButtonView == null) {
             throw new IllegalStateException(ERROR_PLAYVIEW_NULL);
@@ -373,7 +373,7 @@ public class MediaPlayerAndController extends LinearLayout implements MediaPlaye
             // set UI when audio finished playing
             int currentPlayTime = 0;
             seekBar.setProgress(currentPlayTime);
-//            updatePlaytime(currentPlayTime);
+            //updatePlaytime(currentPlayTime);
             updateRuntime(currentPlayTime);
             setPlayable();
             // ensure that our completion listener fires first.
@@ -472,10 +472,6 @@ public class MediaPlayerAndController extends LinearLayout implements MediaPlaye
         Log.d(TAG, sb.toString());
         mediaPlayer.reset();
         return true;
-    }
-
-    @Override
-    public void onCompletion(MediaPlayer mp) {
     }
 
     /****

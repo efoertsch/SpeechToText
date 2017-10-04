@@ -138,7 +138,6 @@ public class AudioRecordUtils {
 
             }
         }
-
     }
 
     public AudioRecord getAudioRecord(long id) {
