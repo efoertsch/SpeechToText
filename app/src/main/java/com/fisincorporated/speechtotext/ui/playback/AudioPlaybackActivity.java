@@ -1,6 +1,8 @@
 package com.fisincorporated.speechtotext.ui.playback;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.fisincorporated.speechtotext.R;
@@ -32,14 +34,30 @@ public class AudioPlaybackActivity extends AudioBaseActivity {
         toolbar.setTitle(R.string.audio_playback_activity_title);
 
         viewModel.setView(findViewById(android.R.id.content));
+        viewModel.setAudioRecord(getIntent().getLongExtra(AUDIO_ID, 0));
+
+        setSupportActionBar(toolbar);
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (firstTime) {
-            viewModel.playAudio(getIntent().getLongExtra(AUDIO_ID, 0));
-            firstTime = false;
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.translation_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.menu_re_run_translation:
+                startTranslation();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -47,16 +65,6 @@ public class AudioPlaybackActivity extends AudioBaseActivity {
     public void onPause() {
         super.onPause();
         viewModel.onPause();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -70,5 +78,13 @@ public class AudioPlaybackActivity extends AudioBaseActivity {
         super.onDestroy();
         viewModel.onDestroy();
     }
+
+
+    private void startTranslation() {
+        viewModel.translateToText();
+    }
+
+
+
 
 }

@@ -32,7 +32,8 @@
         <activity
             android:name=".ui.playback.AudioPlaybackActivity"
             android:screenOrientation="portrait"
-            android:parentActivityName=".ui.list.AudioListActivity">
+            android:parentActivityName=".ui.list.AudioListActivity"
+            android:windowSoftInputMode="stateHidden">
         </activity>
 
         <activity

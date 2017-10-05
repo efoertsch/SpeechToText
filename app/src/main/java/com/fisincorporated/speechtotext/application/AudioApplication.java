@@ -15,11 +15,10 @@ import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
 import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasDispatchingActivityInjector;
-import dagger.android.HasDispatchingServiceInjector;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
-public class AudioApplication extends Application implements HasDispatchingActivityInjector, HasDispatchingServiceInjector {
+public class AudioApplication extends Application implements HasDispatchingActivityInjector {
     private static final String TAG = AudioApplication.class.getSimpleName();
 
     @Inject
@@ -73,11 +72,6 @@ public class AudioApplication extends Application implements HasDispatchingActiv
     @Override
     public DispatchingAndroidInjector<Activity> activityInjector() {
         return dispatchingAndroidInjector;
-    }
-
-    @Override
-    public DispatchingAndroidInjector<Service> serviceInjector() {
-        return dispatchingAndroidJobServiceInjector;
     }
 
     private void loadAudioConverter() {

@@ -40,7 +40,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-//TODO - modify to use injection
 public class SpeechToTextService {
 
     private static final String TAG = SpeechToTextService.class.getSimpleName();
@@ -359,10 +358,11 @@ public class SpeechToTextService {
             @Override
             public void subscribe(@io.reactivex.annotations.NonNull ObservableEmitter<SpeechToTextConversionData> emitter) throws Exception {
                 if (!speechToTextConversionData.getAudioText().isEmpty()) {
-                    AudioRecord audioRecord = audioRecordUtils.getAudioRecord(speechToTextConversionData.getAudioRecordRealmId());
+                    AudioRecord audioRecord = audioRecordUtils.getNonRealmAudioRecord(speechToTextConversionData.getAudioRecordRealmId());
                     if (audioRecord != null) {
                         audioRecord.setSpeechToTextTranslation(speechToTextConversionData.getAudioText());
-                        audioRecordUtils.updateAudioRecordSync(audioRecord);
+                        audioRecord.setXlatJobNumber(0);
+                        audioRecordUtils.updateAudioRecordAsync(audioRecord);
                     }
                 }
                 emitter.onNext(speechToTextConversionData);

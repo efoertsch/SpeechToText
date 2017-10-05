@@ -108,14 +108,11 @@ public class AudioRecordViewModel extends AudioBaseViewModel implements Finished
     }
 
     private void signInForTranslation(AudioRecord audioRecord) {
-
-        // TODO create SignInActivity intent builder and use here and with AudioPlaybackActivity
         SpeechToTextConversionData speechToTextConversionData = new SpeechToTextConversionData(audioRecord.getId(), audioRecord.getDescription(), audioRecordUtils.getAudioDirectoryPath(), audioRecord.getAudioFileName());
         Gson gson = new Gson();
         String jsonData = gson.toJson(speechToTextConversionData);
 
-        Intent intent = new Intent(context, SignInActivity.class);
-        intent.putExtra(SpeechToTextConversionData.SPEECH_TO_TEXT_CONVERSION_DATA, jsonData);
+        Intent intent = SignInActivity.IntentBuilder.getBuilder().setSpeechToTextData(jsonData).build(context);
         context.startActivity(intent);
     }
 
