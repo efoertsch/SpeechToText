@@ -110,7 +110,7 @@ public class MediaPlayerAndController extends LinearLayout implements MediaPlaye
      * controls is made visible. Calling this method has no effect if the audio is already being
      * played.
      ****/
-    public void play(String audioFileName) {
+    public void setAudioFile(String audioFileName) {
 
         initPlayer(audioFileName);
         initOnPlayClick();
@@ -139,9 +139,9 @@ public class MediaPlayerAndController extends LinearLayout implements MediaPlaye
         // enable visibility of all UI controls.
         setViewsVisibility();
 
-        mediaPlayer.start();
+        //mediaPlayer.start();
+        setPlayable();
 
-        setPausable();
     }
 
     /****

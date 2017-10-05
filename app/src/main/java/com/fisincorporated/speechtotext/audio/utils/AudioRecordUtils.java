@@ -135,43 +135,56 @@ public class AudioRecordUtils {
                     Log.d(TAG, "created audio record for " + file.getName());
                     break;
                 }
-
             }
         }
     }
 
-    public AudioRecord getAudioRecord(long id) {
-        AudioRecord realmAudioRecord = realm.where(AudioRecord.class).equalTo(AudioRecord.FIELDS.id.name(), id).findFirst();
-        AudioRecord nonRealmAudioRecord = realm.copyFromRealm(realmAudioRecord);
-        return nonRealmAudioRecord;
+    public AudioRecord getRealmAudioRecord(long id) {
+        return realm.where(AudioRecord.class).equalTo(AudioRecord.FIELDS.id.name(), id).findFirst();
     }
 
-    public void updateAudioRecordAsync(final AudioRecord audioRecord) {
-        if (audioRecord.isChanged()) {
-            // Asynchronously update objects on a background thread
-            realm.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm bgRealm) {
+    public AudioRecord getNonRealmAudioRecord(long id) {
+        AudioRecord realmAudioRecord = getRealmAudioRecord(id);
+        return copyToNonRealmAudioRecord(realmAudioRecord);
+    }
 
-                    bgRealm.copyToRealmOrUpdate(audioRecord);
-                }
-            }, new Realm.Transaction.OnSuccess() {
-                @Override
-                public void onSuccess() {
-
-                    Log.e(TAG, "Success: audioRecord updated");
-                }
-            }, new Realm.Transaction.OnError() {
-                @Override
-                public void onError(Throwable error) {
-
-                    Log.e(TAG, "Error:" + error.toString());
-                }
-            });
-
+    public AudioRecord copyToNonRealmAudioRecord(AudioRecord realmAudioRecord) {
+        AudioRecord nonRealmAudioRecord = null;
+        if (realmAudioRecord != null) {
+            nonRealmAudioRecord = realm.copyFromRealm(realmAudioRecord);
         }
+        return nonRealmAudioRecord;
+
     }
 
+    // Should use for updates on UI thread
+    public void updateAudioRecordAsync(final AudioRecord audioRecord) {
+        // Asynchronously update objects on a background thread
+        realm.executeTransactionAsync(
+                new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm bgRealm) {
+                        bgRealm.copyToRealmOrUpdate(audioRecord);
+                    }
+                }
+                , new Realm.Transaction.OnSuccess() {
+                    @Override
+                    public void onSuccess() {
+                        realm.refresh();
+                        Log.e(TAG, "Success: audioRecord updated: JobId:" + audioRecord.getXlatJobNumber()
+                                + " text:" + audioRecord.getSpeechToTextTranslation());
+                    }
+                }
+                , new Realm.Transaction.OnError() {
+                    @Override
+                    public void onError(Throwable error) {
+                        Log.e(TAG, "Error:" + error.toString());
+                    }
+                });
+
+    }
+
+    // Be careful using this as may block if updates being done on both UI and background threads.
     public void updateAudioRecordSync(final AudioRecord audioRecord) {
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(audioRecord);

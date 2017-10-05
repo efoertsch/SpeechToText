@@ -9,13 +9,14 @@
         <variable
             name="data"
             type="com.fisincorporated.speechtotext.audio.data.AudioRecordInfo"/>
+
         <variable
             name="viewModel"
             type="com.fisincorporated.speechtotext.ui.playback.AudioPlaybackViewModel"/>
     </data>
 
     <android.support.design.widget.CoordinatorLayout
-        android:id="@+id/audio_playback_layout"
+        android:id="@+id/audio_playback_coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
@@ -31,125 +32,123 @@
                 android:id="@+id/toolbar_layout"
                 layout="@layout/simple_toolbar"/>
 
-            <LinearLayout
-                android:id="@+id/audio_playback_view"
+            <ScrollView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_above="@+id/audio_playback_button_layout"
                 android:layout_below="@+id/toolbar_layout"
-                android:layout_gravity="center"
-                android:layout_marginEnd="@dimen/margin_standard"
-                android:layout_marginStart="@dimen/margin_standard"
-                android:orientation="vertical">
+                >
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <RelativeLayout
+                    android:id="@+id/audio_playback_view"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_marginEnd="@dimen/margin_standard"
+                    android:layout_marginStart="@dimen/margin_standard"
+                    android:layout_marginTop="@dimen/margin_standard">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/description_colon"
-                        android:textSize="14sp"/>
-
-                    <EditText
-                        android:id="@+id/audio_playback_description"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/margin_standard"
-                        android:text="@={data.description}"
-                        android:textSize="16sp"
-                        tools:text="Test Audio1"/>
-
-                </LinearLayout>
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/translate"
-                    android:onClick="@{() -> viewModel.translateToText()}"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/audio_playback_speech_to_text"
-                        android:textSize="14sp"
-                        />
-
-                    <EditText
-                        android:id="@+id/audio_playback_speech_to_text"
+                    <LinearLayout
+                        android:id="@+id/audio_playback_description_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_standard"
-                        android:scrollbars="horizontal"
-                        android:inputType="textMultiLine"
-                        android:text="@={data.speechToTextTranslation}"
-                        android:textSize="16sp"
-                        tools:text="Four score and seven years ago our fathers brought forth, upon this continent, a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived, and so dedicated, can long endure."
-                        />
+                        android:layout_alignParentTop="true"
+                        android:layout_marginBottom="@dimen/margin_standard"
+                        android:orientation="horizontal">
 
-                </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="@string/description_colon"
+                            android:textSize="@dimen/text_size_regular"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                        <EditText
+                            android:id="@+id/audio_playback_description"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="@dimen/margin_standard"
+                            android:text="@={data.description}"
+                            android:textColor="@color/text_black"
+                            android:textSize="@dimen/text_size_large"
+                            tools:text="Test Audio1"
+                            />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/audio_record_date"
-                        android:textSize="14sp"
-                        />
+                        android:layout_below="@+id/audio_playback_description_layout"
+                        android:layout_marginBottom="@dimen/margin_standard"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/audio_playback_record_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/margin_standard"
-                        android:text="@{data.recordDateTime}"
-                        android:textSize="16sp"
-                        tools:text="2017-06-29:08:27"
-                        />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/margin_half"
+                            android:text="@string/audio_playback_speech_to_text"
+                            android:textSize="@dimen/text_size_regular"/>
 
-                </LinearLayout>
+                        <EditText
+                            android:id="@+id/audio_playback_speech_to_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_standard"
+                            android:inputType="textMultiLine"
+                            android:scrollbars="vertical"
+                            android:text="@={data.speechToTextTranslation}"
+                            android:textColor="@color/text_black"
+                            android:textSize="@dimen/text_size_large"
+                            tools:text="Four score and seven years ago our fathers brought forth, upon this continent, a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived, and so dedicated, can long endure."/>
 
-            </LinearLayout>
+                    </LinearLayout>
+
+                </RelativeLayout>
+            </ScrollView>
 
             <LinearLayout
+                android:id="@+id/audio_playback_button_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:orientation="vertical">
+                android:layout_above="@+id/audio_playback_media_controller"
+                android:gravity="right"
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/audio_playback_save_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/save"
-                android:layout_alignParentBottom="true"
-                android:onClick="@{() -> viewModel.updateAudioRecord()}"/>
+                <Button
+                    android:id="@+id/audio_playback_save_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:onClick="@{() -> viewModel.updateAudioRecord()}"
+                    android:text="@string/save"
+                    />
 
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/audio_playback_floatingActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginBottom="@dimen/margin_standard"
+                    android:layout_marginRight="@dimen/margin_standard"
+                    android:layout_marginTop="@dimen/margin_standard"
+                    android:clickable="true"
+                    android:onClick="@{() -> viewModel.editDescriptionAndText()}"
+                    android:visibility="gone"
+                    app:fabSize="mini"
+                    app:srcCompat="@drawable/ic_action_pencil"/>
+            </LinearLayout>
 
             <com.fisincorporated.speechtotext.ui.MediaPlayerAndController
                 android:id="@+id/audio_playback_media_controller"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
                 android:layout_marginEnd="@dimen/margin_standard"
-                android:layout_below="@+id/audio_playback_save_btn"
                 android:layout_marginStart="@dimen/margin_standard">
 
             </com.fisincorporated.speechtotext.ui.MediaPlayerAndController>
-            </LinearLayout>
+
 
         </RelativeLayout>
 

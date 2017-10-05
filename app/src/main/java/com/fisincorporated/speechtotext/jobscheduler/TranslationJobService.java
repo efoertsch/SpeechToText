@@ -12,6 +12,8 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 import com.fisincorporated.speechtotext.R;
+import com.fisincorporated.speechtotext.audio.data.AudioRecord;
+import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
 import com.fisincorporated.speechtotext.audio.utils.SpeechToTextConversionData;
 import com.fisincorporated.speechtotext.audio.utils.SpeechToTextService;
 import com.fisincorporated.speechtotext.dagger.service.DaggerTranslationJobServiceComponent;
@@ -40,6 +42,9 @@ public class TranslationJobService extends JobService {
     @Inject
     public SpeechToTextService speechToTextService;
 
+    @Inject
+    public AudioRecordUtils audioRecordUtils;
+
     /**
      * Called by system to start the job. Note this call is on main thread. So any long running tasks
      * must use another thread to do work
@@ -55,7 +60,6 @@ public class TranslationJobService extends JobService {
         //speechToTextService = new SpeechToTextService(this);
         Log.d(TAG, "onStartJob called");
         return startSpeechToTextTranslation(params);
-
     }
 
     private void doInjection() {
@@ -63,7 +67,6 @@ public class TranslationJobService extends JobService {
                 .translationJobServiceModule(new TranslationJobServiceModule(this))
                 .build()
                 .inject(this);
-
     }
 
     private SpeechToTextConversionData getConversionData(JobParameters params) {
@@ -107,6 +110,8 @@ public class TranslationJobService extends JobService {
     public boolean startSpeechToTextTranslation(JobParameters params) {
 
         SpeechToTextConversionData speechToTextConversionData = getConversionData(params);
+
+        updateAudioRecordWithJobId(speechToTextConversionData, params);
 
         if (speechToTextConversionData != null) {
             postNotification(speechToTextConversionData);
@@ -153,6 +158,14 @@ public class TranslationJobService extends JobService {
         Log.d(TAG, "Job started but missing SpeechToTextData!");
         return true;
 
+    }
+
+    private void updateAudioRecordWithJobId(SpeechToTextConversionData speechToTextConversionData, JobParameters params) {
+        AudioRecord audioRecord = audioRecordUtils.getNonRealmAudioRecord(speechToTextConversionData.getAudioRecordRealmId());
+        if (audioRecord != null) {
+            audioRecord.setXlatJobNumber(params.getJobId());
+            audioRecordUtils.updateAudioRecordAsync(audioRecord);
+        }
     }
 
     public void postNotification(SpeechToTextConversionData speechToTextConversionData) {

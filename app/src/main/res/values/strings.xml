@@ -89,5 +89,13 @@
     <string name="oops_an_error_has_occurred">Oops! An error has occurred converting %1$s to text! Error: %2$s</string>
     <string name="text_to_speech_conversion_proceeding">Text to speech process proceeding for: %1$s</string>
 
+    <!--Toast mgs -->
+    <string name="translation_in_progress">Speech to text translation in progress. Editting not allowed till translation completed.</string>
+    <string name="translation_not_allowed_during_editing">(Re)Translation can not occur during editing</string>
+
+    <!-- Menu text -->
+    <string name="re_run_translation">(Re)Run Translation</string>
+
+
 
 </resources>

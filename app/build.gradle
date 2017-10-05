@@ -76,6 +76,7 @@ dependencies {
     final RETROFIT_VERSION = '2.3.0'
     final FIREBASE_VERSION = '11.2.2'  //'10.0.1'
     final GOOGLE_API_CLIENT = '1.22.0'
+    final REALM_ANDROID_ADAPTER_VERSION = '1.4.0'
 
     //Retrofit
     compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
@@ -116,7 +117,7 @@ dependencies {
 
     // See project level build.gradle for Realm plugin
     // For Realm recyclerView adapter
-    compile  'io.realm:android-adapters:1.4.0'
+    compile  "io.realm:android-adapters:$REALM_ANDROID_ADAPTER_VERSION"
 
     // Authenticate using Google sign-in - note firebase is needed even if not using firebase api's
     compile "com.google.android.gms:play-services-auth:$FIREBASE_VERSION"

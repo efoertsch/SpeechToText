@@ -4,7 +4,10 @@ package com.fisincorporated.speechtotext.ui.playback;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.fisincorporated.speechtotext.R;
 import com.fisincorporated.speechtotext.audio.data.AudioRecord;
@@ -18,9 +21,14 @@ import com.google.gson.Gson;
 
 import javax.inject.Inject;
 
+import io.netty.util.internal.StringUtil;
 import io.reactivex.disposables.CompositeDisposable;
+import io.realm.ObjectChangeSet;
+import io.realm.RealmObjectChangeListener;
 
-public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioRecord.ChangeListener {
+
+//TODO figure out better way to handle Realm object updates
+public class AudioPlaybackViewModel extends AudioBaseViewModel {
     private static final String TAG = AudioPlaybackViewModel.class.getSimpleName();
 
     private AudioPlaybackBinding viewDataBinding;
@@ -35,30 +43,32 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioR
 
     private final CompositeDisposable disposables = new CompositeDisposable();
 
+    private final RealmObjectChangeListener<AudioRecord> audioRecordChangeListener = new RealmObjectChangeListener<AudioRecord>() {
+        @Override
+        public void onChange(AudioRecord audioRecord, ObjectChangeSet changeSet) {
+
+            if (audioRecord != null) {
+                updateDisplay(audioRecord);
+
+            }
+            for (String fieldName : changeSet.getChangedFields()) {
+                Log.i(TAG, "Field " + fieldName + " was changed.");
+            }
+        }
+    };
+
+    private void updateDisplay(AudioRecord audioRecord) {
+        this.audioRecord = audioRecordUtils.copyToNonRealmAudioRecord(audioRecord);
+        viewDataBinding.setData(this.audioRecord);
+        viewDataBinding.executePendingBindings();
+    }
+
     @Inject
     public AudioPlaybackViewModel(Context context, AudioRecordUtils audioRecordUtils) {
         this.context = context;
         this.audioRecordUtils = audioRecordUtils;
     }
 
-    public AudioPlaybackViewModel setView(View view) {
-        View bindingView = view.findViewById(R.id.audio_playback_layout);
-        viewDataBinding = DataBindingUtil.bind(bindingView);
-        mediaPlayerAndController = viewDataBinding.audioPlaybackMediaController;
-        return this;
-    }
-
-    void playAudio(long audioRecordId) {
-        if (audioRecordId != 0) {
-            audioRecord = audioRecordUtils.getAudioRecord(audioRecordId);
-            String audioFile = audioRecordUtils.getAbsoluteFileName(audioRecord.getAudioFileName());
-            viewDataBinding.setData(audioRecord);
-            viewDataBinding.setViewModel(this);
-            viewDataBinding.executePendingBindings();
-            // TODO send filename to view to play
-            mediaPlayerAndController.play(audioFile);
-        }
-    }
 
     @Override
     public void onPause() {
@@ -73,14 +83,71 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioR
         disposables.dispose();
     }
 
+
+    public AudioPlaybackViewModel setView(View view) {
+        View bindingView = view.findViewById(R.id.audio_playback_coordinator_layout);
+        viewDataBinding = DataBindingUtil.bind(bindingView);
+        mediaPlayerAndController = viewDataBinding.audioPlaybackMediaController;
+        viewDataBinding.audioPlaybackDescription.setMovementMethod(new ScrollingMovementMethod());
+        return this;
+    }
+
+    public AudioPlaybackViewModel setAudioRecord(long audioRecordId) {
+        if (audioRecordId != 0) {
+            AudioRecord realmAudioRecord = audioRecordUtils.getRealmAudioRecord(audioRecordId);
+            if (realmAudioRecord != null) {
+                realmAudioRecord.addChangeListener(audioRecordChangeListener);
+                audioRecord = audioRecordUtils.copyToNonRealmAudioRecord(realmAudioRecord);
+                if (audioRecord != null) {
+                    String audioFile = audioRecordUtils.getAbsoluteFileName(audioRecord.getAudioFileName());
+                    mediaPlayerAndController.setAudioFile(audioFile);
+                    viewDataBinding.setData(audioRecord);
+                    viewDataBinding.setViewModel(this);
+                    setButtonVisibility(true);
+                    turnOffEditTextEnabled();
+                    viewDataBinding.executePendingBindings();
+                }
+            }
+        }
+        return this;
+    }
+
+    private void setButtonVisibility(boolean displayFab) {
+        viewDataBinding.audioPlaybackFloatingActionButton.setVisibility(displayFab ? View.VISIBLE : View.GONE);
+        viewDataBinding.audioPlaybackSaveBtn.setVisibility(displayFab ? View.GONE : View.VISIBLE);
+    }
+
+    public void editDescriptionAndText() {
+        viewDataBinding.audioPlaybackDescription.setEnabled(true);
+        viewDataBinding.audioPlaybackSpeechToText.setEnabled(audioRecord.getXlatJobNumber() == 0);
+        if (audioRecord.getXlatJobNumber() <= 0 && StringUtil.isNullOrEmpty(audioRecord.getSpeechToTextTranslation())) {
+            displayXlatingText();
+        }
+        setButtonVisibility(false);
+    }
+
+    private void turnOffEditTextEnabled() {
+        viewDataBinding.audioPlaybackDescription.setEnabled(false);
+        viewDataBinding.audioPlaybackSpeechToText.setEnabled(false);
+    }
+
+    private void displayXlatingText() {
+        Toast.makeText(context, R.string.translation_in_progress, Toast.LENGTH_LONG).show();
+    }
+
+
     public void translateToText() {
-        removePriorText();
-        startTranslationProcess();
+        if (viewDataBinding.audioPlaybackFloatingActionButton.getVisibility() == View.VISIBLE) {
+            removePriorText();
+            startTranslationProcess();
+        } else {
+            Toast.makeText(context, R.string.translation_not_allowed_during_editing, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void removePriorText() {
         audioRecord.setSpeechToTextTranslation("");
-        audioRecordUtils.updateAudioRecordSync(audioRecord);
+        audioRecordUtils.updateAudioRecordAsync(audioRecord);
         viewDataBinding.executePendingBindings();
     }
 
@@ -89,26 +156,20 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel implements AudioR
         Gson gson = new Gson();
         String jsonData = gson.toJson(speechToTextConversionData);
 
-        Intent intent = new Intent(context, SignInActivity.class);
-        intent.putExtra(SpeechToTextConversionData.SPEECH_TO_TEXT_CONVERSION_DATA, jsonData);
+        Intent intent = SignInActivity.IntentBuilder.getBuilder().setSpeechToTextData(jsonData).build(context);
         context.startActivity(intent);
     }
 
 
-
-
-    @Override
-    public void onChange() {
-
-        viewDataBinding.audioPlaybackSaveBtn.setVisibility(View.VISIBLE);
-    }
-
     // Called via xml onClick
     public void updateAudioRecord() {
         audioRecordUtils.updateAudioRecordAsync(audioRecord);
+        setButtonVisibility(true);
+        turnOffEditTextEnabled();
     }
 
     void stopPlaying() {
         mediaPlayerAndController.pause();
     }
+
 }

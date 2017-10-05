@@ -2,6 +2,7 @@ package com.fisincorporated.speechtotext.ui.signin;
 
 import android.accounts.Account;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -162,15 +163,18 @@ public class SignInActivity extends AppCompatActivity implements
     }
 
     private void checkForSpeechToTextData() {
-        String jsonData = getIntent().getStringExtra(SpeechToTextConversionData.SPEECH_TO_TEXT_CONVERSION_DATA);
-        if (jsonData != null && !jsonData.isEmpty()) {
-            Gson gson = new Gson();
-            speechToTextConversionData = gson.fromJson(jsonData, SpeechToTextConversionData.class);
-            if (speechToTextConversionData == null ||
-                    speechToTextConversionData.getAudioRecordRealmId() <= 0
-                    || speechToTextConversionData.getAudio3gpFileName() == null
-                    || speechToTextConversionData.getAudio3gpFileName().isEmpty()) {
-                finish();
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            String jsonData = bundle.getString(SpeechToTextConversionData.SPEECH_TO_TEXT_CONVERSION_DATA);
+            if (jsonData != null && !jsonData.isEmpty()) {
+                Gson gson = new Gson();
+                speechToTextConversionData = gson.fromJson(jsonData, SpeechToTextConversionData.class);
+                if (speechToTextConversionData == null ||
+                        speechToTextConversionData.getAudioRecordRealmId() <= 0
+                        || speechToTextConversionData.getAudio3gpFileName() == null
+                        || speechToTextConversionData.getAudio3gpFileName().isEmpty()) {
+                    finish();
+                }
             }
         }
     }
@@ -372,4 +376,30 @@ public class SignInActivity extends AppCompatActivity implements
         signOnErrorDialog.show();
     }
 
+
+
+    public static class IntentBuilder {
+        private Bundle extras;
+
+        private IntentBuilder() {
+            extras = new Bundle();
+        }
+
+        public static IntentBuilder getBuilder() {
+            IntentBuilder builder = new IntentBuilder();
+            return builder;
+        }
+
+        public IntentBuilder setSpeechToTextData(String speechTToTextConversionDataJson) {
+            extras.putString(SpeechToTextConversionData.SPEECH_TO_TEXT_CONVERSION_DATA, speechTToTextConversionDataJson);
+            return this;
+        }
+
+
+        public Intent build(Context ctx) {
+            Intent i = new Intent(ctx, SignInActivity.class);
+            i.putExtras(extras);
+            return i;
+        }
+    }
 }
