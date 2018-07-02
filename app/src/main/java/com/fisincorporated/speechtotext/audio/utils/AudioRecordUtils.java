@@ -39,7 +39,7 @@ public class AudioRecordUtils {
     }
 
     public OrderedRealmCollection<AudioRecord> getOrderedRealmCollection() {
-        return realm.where(AudioRecord.class).notEqualTo(AudioRecord.FIELDS.id.name(), 0).findAllSorted(AudioRecord.FIELDS.id.name(), Sort.DESCENDING);
+        return realm.where(AudioRecord.class).notEqualTo(AudioRecord.FIELDS.id.name(), 0).findAll().sort(AudioRecord.FIELDS.id.name(), Sort.DESCENDING);
     }
 
     public String getAudioDirectoryPath() {

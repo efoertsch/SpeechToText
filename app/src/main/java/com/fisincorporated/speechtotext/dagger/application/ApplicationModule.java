@@ -14,7 +14,8 @@ import dagger.Provides;
 @Module
 public class ApplicationModule {
 
-    @Provides Context provideContext(AudioApplication application) {
+    @Provides
+    Context provideContext(AudioApplication application) {
         return application.getApplicationContext();
     }
 

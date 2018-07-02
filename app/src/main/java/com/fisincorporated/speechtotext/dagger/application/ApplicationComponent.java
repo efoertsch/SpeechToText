@@ -10,16 +10,18 @@ import javax.inject.Singleton;
 import dagger.BindsInstance;
 import dagger.Component;
 import dagger.android.AndroidInjectionModule;
+import dagger.android.AndroidInjector;
 
 
 @Singleton
 @Component(modules = {ActivityBuildersModule.class, AndroidInjectionModule.class, ApplicationModule.class, RetrofitModule.class})
-public interface ApplicationComponent {
+public interface ApplicationComponent  extends AndroidInjector<AudioApplication> {
 
     @Component.Builder
     interface Builder {
         @BindsInstance
         Builder application(AudioApplication application);
+
         ApplicationComponent build();
     }
 

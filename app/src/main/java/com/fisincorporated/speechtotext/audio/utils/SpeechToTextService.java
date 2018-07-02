@@ -73,7 +73,7 @@ public class SpeechToTextService {
      * @param speechToTextConversionData
      * @return observable process
      */
-    public Observable<SpeechToTextConversionData> getSpeechToTextObservable(SpeechToTextConversionData speechToTextConversionData) {
+    public Observable<SpeechToTextConversionData>    getSpeechToTextObservable(SpeechToTextConversionData speechToTextConversionData) {
 
         Observable<SpeechToTextConversionData> observable = Observable.concatArray(
                 audio3GpToFlacObservable(speechToTextConversionData)
@@ -150,7 +150,7 @@ public class SpeechToTextService {
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 // Get a URL to the uploaded content
                                 @SuppressWarnings("VisibleForTests")
-                                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                Uri downloadUrl = taskSnapshot.getUploadSessionUri();
                                 try {
                                     speechToTextConversionData.setUploadToGcsSuccess(true);
                                     speechToTextConversionData.setGcsAudioFileName(speechToTextConversionData.getAudioFlacFileName());
