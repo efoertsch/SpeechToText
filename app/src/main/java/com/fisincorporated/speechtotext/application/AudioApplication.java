@@ -32,8 +32,9 @@ public class AudioApplication extends DaggerApplication {
 
     @Override
     public void onCreate() {
-        super.onCreate();
         connectRealm();
+        super.onCreate();
+        //connectRealm();
         applicationInjector();
         audioRecordsUtils.listAudioFiles();
         audioRecordsUtils.createMissingAudioRecords();
