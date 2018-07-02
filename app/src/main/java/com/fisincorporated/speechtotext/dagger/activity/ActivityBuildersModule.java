@@ -37,6 +37,6 @@ public abstract class ActivityBuildersModule {
     abstract AndroidInjector.Factory<? extends Activity> bindSignInActvityInjectorFactory(SignInActivitySubComponent.Builder builder);
 
     // Add more bindings here for other sub components
-    // Be sure not to provide any dependencies for the subcomponent here since this module will be included in the application component and could thereby have application scope.
+    // Be sure not to provide any dependencies for the subcomponent here since this module will be included in the application applicationComponent and could thereby have application scope.
 
 }

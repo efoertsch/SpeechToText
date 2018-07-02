@@ -1,31 +1,30 @@
 package com.fisincorporated.speechtotext.application;
 
-import android.app.Activity;
-import android.app.Application;
-import android.app.Service;
 import android.util.Log;
 
 import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
+import com.fisincorporated.speechtotext.dagger.application.ApplicationComponent;
 import com.fisincorporated.speechtotext.dagger.application.DaggerApplicationComponent;
 
 import javax.inject.Inject;
 
 import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
 import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasDispatchingActivityInjector;
+import dagger.android.AndroidInjector;
+import dagger.android.DaggerApplication;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
-public class AudioApplication extends Application implements HasDispatchingActivityInjector {
+public class AudioApplication extends DaggerApplication {
     private static final String TAG = AudioApplication.class.getSimpleName();
+    protected ApplicationComponent applicationComponent;
 
-    @Inject
-    DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
-
-    @Inject
-    DispatchingAndroidInjector<Service> dispatchingAndroidJobServiceInjector;
+//    @Inject
+//    DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
+//
+//    @Inject
+//    DispatchingAndroidInjector<Service> dispatchingAndroidJobServiceInjector;
 
 
     @Inject
@@ -35,7 +34,7 @@ public class AudioApplication extends Application implements HasDispatchingActiv
     public void onCreate() {
         super.onCreate();
         connectRealm();
-        createDaggerInjections();
+        applicationInjector();
         audioRecordsUtils.listAudioFiles();
         audioRecordsUtils.createMissingAudioRecords();
         loadAudioConverter();
@@ -61,18 +60,13 @@ public class AudioApplication extends Application implements HasDispatchingActiv
         Log.d(TAG, "number of audio records:" + count);
     }
 
-    protected void createDaggerInjections() {
-        DaggerApplicationComponent
-                .builder()
-                .application(this)
-                .build()
-                .inject(this);
+    @Override
+    protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
+        applicationComponent = DaggerApplicationComponent.builder().application(this).build();
+        applicationComponent.inject(this);
+        return applicationComponent;
     }
 
-    @Override
-    public DispatchingAndroidInjector<Activity> activityInjector() {
-        return dispatchingAndroidInjector;
-    }
 
     private void loadAudioConverter() {
         AndroidAudioConverter.load(this, new ILoadCallback() {
