@@ -20,27 +20,18 @@ public class AudioApplication extends DaggerApplication {
     private static final String TAG = AudioApplication.class.getSimpleName();
     protected ApplicationComponent applicationComponent;
 
-//    @Inject
-//    DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
-//
-//    @Inject
-//    DispatchingAndroidInjector<Service> dispatchingAndroidJobServiceInjector;
-
-
     @Inject
     AudioRecordUtils audioRecordsUtils;
 
     @Override
     public void onCreate() {
+        // Need to initialize Realm first, else get npe when firing up dagger injection
         connectRealm();
         super.onCreate();
-        //connectRealm();
         applicationInjector();
         audioRecordsUtils.listAudioFiles();
         audioRecordsUtils.createMissingAudioRecords();
         loadAudioConverter();
-
-
     }
 
     private void connectRealm() {
@@ -48,12 +39,7 @@ public class AudioApplication extends DaggerApplication {
         RealmConfiguration realmConfig = new RealmConfiguration.Builder()
                 .name("audio.files")
                 .schemaVersion(0)
-                .initialData(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        realm.createObject(AudioRecord.class, new Long(0));
-                    }
-                })
+                .initialData(realm -> realm.createObject(AudioRecord.class, new Long(0)))
                 .build();
         Realm.setDefaultConfiguration(realmConfig);
         Realm realm = Realm.getDefaultInstance();

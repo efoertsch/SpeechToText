@@ -42,17 +42,14 @@ public class AudioListAdapter extends RealmRecyclerViewAdapter<AudioRecord, Audi
         holder.data = audioRecord;
         holder.title.setText((audioRecord.getDescription()));
         holder.recordDate.setText(audioRecord.getRecordDateTime());
+
         if (playAudioCallback != null) {
-            holder.playAudioButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    playAudioCallback.playAudioRecord(audioRecord);
-                }
-            });
+            holder.itemView.setOnClickListener(v -> playAudioCallback.playAudioRecord(audioRecord));
+            holder.playAudioButton.setOnClickListener(v -> playAudioCallback.playAudioRecord(audioRecord));
         }
         holder.speechToTextView.setVisibility((audioRecord.getSpeechToTextTranslation() != null
-                            && !audioRecord.getSpeechToTextTranslation().isEmpty()
-                            && !audioRecord.getSpeechToTextTranslation().equals("\n")) ?  View.VISIBLE : View.GONE);
+                && !audioRecord.getSpeechToTextTranslation().isEmpty()
+                && !audioRecord.getSpeechToTextTranslation().equals("\n")) ? View.VISIBLE : View.GONE);
 
     }
 
@@ -69,16 +66,16 @@ public class AudioListAdapter extends RealmRecyclerViewAdapter<AudioRecord, Audi
         TextView title;
         TextView recordDate;
         ImageButton playAudioButton;
-        TextView  speechToTextView;
+        TextView speechToTextView;
 
         public AudioRecord data;
 
         MyViewHolder(View view) {
             super(view);
-            title = (TextView) view.findViewById(R.id.audio_record_description);
-            recordDate = (TextView) view.findViewById(R.id.audio_record_date);
-            playAudioButton = (ImageButton) view.findViewById(R.id.audio_record_play_image);
-            speechToTextView = (TextView) view.findViewById(R.id.audio_record_speech_to_text);
+            title = view.findViewById(R.id.audio_record_description);
+            recordDate = view.findViewById(R.id.audio_record_date);
+            playAudioButton = view.findViewById(R.id.audio_record_play_image);
+            speechToTextView = view.findViewById(R.id.audio_record_speech_to_text);
 
         }
     }
