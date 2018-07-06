@@ -311,7 +311,7 @@ public class SpeechToTextService {
                 alternativeIx = 0;
                 for (Alternative alternative : result.getAlternatives()) {
                     Log.d(TAG, String.format("Transcription: %s%n", alternative.getTranscript()));
-                    sb.append(alternativeIx == 0 ? alternative.getTranscript() : "  [[" + alternative.getTranscript() + "]]" + '\n');
+                    sb.append(alternativeIx == 0 ? alternative.getTranscript() : "\n [[" + alternative.getTranscript() + "]]" + '\n');
                     alternativeIx++;
                 }
             }
