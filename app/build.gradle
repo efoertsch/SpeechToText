@@ -6,12 +6,11 @@ apply plugin: 'realm-android'
 //apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.3"
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.fisincorporated.speechtotext"
         minSdkVersion 21
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -67,17 +66,20 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    final SUPPORT_LIBRARY_VERSION = '27.1.1'
-    final CONSTRAINT_LAYOUT_VERSION = '1.1.2'
-    final DAGGER_VERSION = '2.14.1'
+    final SUPPORT_LIBRARY_VERSION = '28.0.0'
+    final GOOGLE_CLOUD_SPEECH_VERSION = "0.80.0-beta"
+    final CONSTRAINT_LAYOUT_VERSION = '1.1.3'
+    final DAGGER_VERSION = '2.15'
+    final RXJAVA2_VERSION = '2.2.8'
     final JSR250_VERSION = '1.0'
     final ESPRESSO_CORE_VERSION = '2.2.2'
     final JUNIT4_VERSION = '4.12'
     final RETROFIT_VERSION = '2.3.0'
-    final PLAY_SERVICES_VERSION = '15.0.1'
+    final PLAY_SERVICES_VERSION = '16.0.0'
     final FIREBASE_VERSION = '16.0.1'  //'10.0.1'
     final GOOGLE_API_CLIENT = '1.22.0'
     final REALM_ANDROID_ADAPTER_VERSION = '1.4.0'
+    final ADRIELCAFE_ANDROID_AUDIO_CONVERTER = "0.0.8"
 
     annotationProcessor('com.google.auto.value:auto-value:1.2')
 
@@ -98,19 +100,17 @@ dependencies {
 
     // Speech To Text
     // Using API calls instead
-    implementation 'com.google.cloud:google-cloud-speech:0.22.0-alpha'
+    implementation "com.google.cloud:google-cloud-speech:$GOOGLE_CLOUD_SPEECH_VERSION"
 
     // Convert to convert 3gp audio to flac - https://github.com/adrielcafe/AndroidAudioConverter
-    implementation 'com.github.adrielcafe:AndroidAudioConverter:0.0.8'
+    implementation "com.github.adrielcafe:AndroidAudioConverter:$ADRIELCAFE_ANDROID_AUDIO_CONVERTER"
 
     //RxJava
-    implementation group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.12'
+    implementation "io.reactivex.rxjava2:rxjava:$RXJAVA2_VERSION"
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
 
     // For debugging/com.google.common.io.BaseEncoding
     //implementation 'com.google.guava:guava:22.0-android'
-
-    implementation 'com.github.adrielcafe:AndroidAudioConverter:0.0.8'
 
     // For Dagger2
     implementation "com.google.dagger:dagger:$DAGGER_VERSION"

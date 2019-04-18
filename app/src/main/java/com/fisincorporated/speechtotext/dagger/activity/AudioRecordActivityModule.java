@@ -11,10 +11,11 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 
-@PerActivity
+
 @Module
 public class AudioRecordActivityModule {
 
+    @PerActivity
     @Provides
     public AudioRecordViewModel providesAudioRecordViewModel(AudioRecordActivity activity, @Singleton AudioService audioService, @Singleton AudioRecordUtils audioRecordUtils) {
         return new AudioRecordViewModel(activity, audioService, audioRecordUtils);

@@ -8,10 +8,11 @@ import dagger.Module;
 import dagger.Provides;
 
 
-@PerActivity
+
 @Module
 public class SignInActivityModule {
 
+    @PerActivity
     @Provides
     public JobSchedulerUtil providesJobSchedulerUtil(SignInActivity activity) {
         return new JobSchedulerUtil();

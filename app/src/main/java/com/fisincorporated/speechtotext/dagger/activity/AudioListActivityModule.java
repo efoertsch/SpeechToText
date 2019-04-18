@@ -13,19 +13,22 @@ import dagger.Provides;
 import io.realm.OrderedRealmCollection;
 
 @Module
-@PerActivity
+
 public class AudioListActivityModule {
 
+    @PerActivity
     @Provides
     public AudioListViewModel providesAudioListViewModel(AudioListActivity activity, AudioRecordUtils audioRecordUtils) {
         return new AudioListViewModel(activity,  providesAudioListAdapter(activity, audioRecordUtils), audioRecordUtils);
     }
 
+    @PerActivity
     @Provides
     public AudioListAdapter providesAudioListAdapter(AudioListActivity activity,   AudioRecordUtils audioRecordUtils){
         return new AudioListAdapter(activity, providesOrderedRealmCollection(audioRecordUtils));
     }
 
+    @PerActivity
     @Provides
     public OrderedRealmCollection<AudioRecord> providesOrderedRealmCollection(AudioRecordUtils audioRecordUtils){
         return audioRecordUtils.getOrderedRealmCollection();
