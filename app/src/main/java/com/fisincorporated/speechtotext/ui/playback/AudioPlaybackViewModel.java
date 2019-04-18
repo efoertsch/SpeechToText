@@ -17,13 +17,12 @@ import com.fisincorporated.speechtotext.databinding.AudioPlaybackBinding;
 import com.fisincorporated.speechtotext.ui.AudioBaseViewModel;
 import com.fisincorporated.speechtotext.ui.MediaPlayerAndController;
 import com.fisincorporated.speechtotext.ui.signin.SignInActivity;
+import com.google.api.client.util.Strings;
 import com.google.gson.Gson;
 
 import javax.inject.Inject;
 
-import io.netty.util.internal.StringUtil;
 import io.reactivex.disposables.CompositeDisposable;
-import io.realm.ObjectChangeSet;
 import io.realm.RealmObjectChangeListener;
 
 
@@ -43,17 +42,14 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel {
 
     private final CompositeDisposable disposables = new CompositeDisposable();
 
-    private final RealmObjectChangeListener<AudioRecord> audioRecordChangeListener = new RealmObjectChangeListener<AudioRecord>() {
-        @Override
-        public void onChange(AudioRecord audioRecord, ObjectChangeSet changeSet) {
+    private final RealmObjectChangeListener<AudioRecord> audioRecordChangeListener = (audioRecord, changeSet) -> {
 
-            if (audioRecord != null) {
-                updateDisplay(audioRecord);
+        if (audioRecord != null) {
+            updateDisplay(audioRecord);
 
-            }
-            for (String fieldName : changeSet.getChangedFields()) {
-                Log.i(TAG, "Field " + fieldName + " was changed.");
-            }
+        }
+        for (String fieldName : changeSet.getChangedFields()) {
+            Log.i(TAG, "Field " + fieldName + " was changed.");
         }
     };
 
@@ -120,7 +116,7 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel {
     public void editDescriptionAndText() {
         viewDataBinding.audioPlaybackDescription.setEnabled(true);
         viewDataBinding.audioPlaybackSpeechToText.setEnabled(audioRecord.getXlatJobNumber() == 0);
-        if (audioRecord.getXlatJobNumber() <= 0 && StringUtil.isNullOrEmpty(audioRecord.getSpeechToTextTranslation())) {
+        if (audioRecord.getXlatJobNumber() <= 0 && Strings.isNullOrEmpty(audioRecord.getSpeechToTextTranslation())) {
             displayXlatingText();
         }
         setButtonVisibility(false);
