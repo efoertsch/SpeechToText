@@ -97,5 +97,9 @@
     <string name="re_run_translation">(Re)Run Translation</string>
 
 
+    <!-- Drive File folder name -->
+    <string name="drive_file_folder_name">SpeechToText</string>
+    <string name="audio_to_text">AudioToText</string>
+
 
 </resources>

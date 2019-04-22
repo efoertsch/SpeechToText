@@ -148,7 +148,9 @@ public class AudioPlaybackViewModel extends AudioBaseViewModel {
     }
 
     private void startTranslationProcess() {
-        SpeechToTextConversionData speechToTextConversionData = new SpeechToTextConversionData(audioRecord.getId(), audioRecord.getDescription(), audioRecordUtils.getAudioDirectoryPath(), audioRecord.getAudioFileName());
+        SpeechToTextConversionData speechToTextConversionData = new SpeechToTextConversionData(audioRecord.getId(), audioRecord.getDescription()
+                , audioRecordUtils.getAudioDirectoryPath(), audioRecord.getAudioFileName()
+        ,"");
         Gson gson = new Gson();
         String jsonData = gson.toJson(speechToTextConversionData);
 

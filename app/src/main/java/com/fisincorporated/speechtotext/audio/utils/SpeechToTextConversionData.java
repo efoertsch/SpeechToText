@@ -83,13 +83,25 @@ public class SpeechToTextConversionData extends BaseJson {
     @Expose
     private boolean translationDone = false;
 
+    @SerializedName("driveFileFolder")
+    @Expose
+    private String driveFileFolder = "";
+
+    @SerializedName("driveFileName")
+    @Expose
+    private String driveFileName = "";
+
+
+
     private SpeechToTextConversionData(){}
 
-    public SpeechToTextConversionData(long audioRecordRealmId, String description, String deviceAbsolutePathToAudioFile, String audio3gpFileName){
+    public SpeechToTextConversionData(long audioRecordRealmId, String description
+            , String deviceAbsolutePathToAudioFile, String audio3gpFileName, String driveFileFolder){
         this.audioRecordRealmId = audioRecordRealmId;
         this.audioDescripton = description;
         this.deviceAbsolutePathToAudioFile = deviceAbsolutePathToAudioFile;
         this.audio3gpFileName = audio3gpFileName;
+        this.driveFileFolder = driveFileFolder;
     };
 
     public String getAudioDescripton() {
@@ -232,5 +244,21 @@ public class SpeechToTextConversionData extends BaseJson {
 
     public void setTranslationDone(boolean translationDone) {
         this.translationDone = translationDone;
+    }
+
+    public String getDriveFileFolder() {
+        return driveFileFolder;
+    }
+
+    public void setDriveFileFolder(String driveFileFolder) {
+        this.driveFileFolder = driveFileFolder;
+    }
+
+    public String getDriveFileName() {
+        return driveFileName;
+    }
+
+    public void setDriveFileName(String driveFileName) {
+        this.driveFileName = driveFileName;
     }
 }

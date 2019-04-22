@@ -108,7 +108,12 @@ public class AudioRecordViewModel extends AudioBaseViewModel implements Finished
     }
 
     private void signInForTranslation(AudioRecord audioRecord) {
-        SpeechToTextConversionData speechToTextConversionData = new SpeechToTextConversionData(audioRecord.getId(), audioRecord.getDescription(), audioRecordUtils.getAudioDirectoryPath(), audioRecord.getAudioFileName());
+        SpeechToTextConversionData speechToTextConversionData = new SpeechToTextConversionData(audioRecord.getId()
+                , audioRecord.getDescription()
+                , audioRecordUtils.getAudioDirectoryPath()
+                , audioRecord.getAudioFileName()
+                , context.getString(R.string.drive_file_folder_name));
+
         Gson gson = new Gson();
         String jsonData = gson.toJson(speechToTextConversionData);
 

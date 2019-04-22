@@ -30,6 +30,7 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.Scope;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.common.base.Strings;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -108,8 +109,8 @@ public class SignInActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_google_signin);
 
         // Views
-        mStatusTextView = (TextView) findViewById(R.id.status);
-        mDetailTextView = (TextView) findViewById(R.id.detail);
+        mStatusTextView = findViewById(R.id.status);
+        mDetailTextView = findViewById(R.id.detail);
 
         // Button listeners
         findViewById(R.id.sign_in_button).setOnClickListener(this);
@@ -118,7 +119,7 @@ public class SignInActivity extends AppCompatActivity implements
 
         // [START customize_button]
         // Set the dimensions of the sign-in button.
-        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        SignInButton signInButton = findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
 
     }
@@ -139,7 +140,7 @@ public class SignInActivity extends AppCompatActivity implements
         String oauth2Token = TokenStorage.getToken(this);
         if (oauth2Token == null) {
             if (checkIfSignedInToGoogle()) {
-                signOut();
+            //    signOut();
             } else {
                 signIn();
             }
@@ -166,7 +167,7 @@ public class SignInActivity extends AppCompatActivity implements
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             String jsonData = bundle.getString(SpeechToTextConversionData.SPEECH_TO_TEXT_CONVERSION_DATA);
-            if (jsonData != null && !jsonData.isEmpty()) {
+            if (!Strings.isNullOrEmpty(jsonData)) {
                 Gson gson = new Gson();
                 speechToTextConversionData = gson.fromJson(jsonData, SpeechToTextConversionData.class);
                 if (speechToTextConversionData == null ||
