@@ -140,7 +140,7 @@ public class SignInActivity extends AppCompatActivity implements
         String oauth2Token = TokenStorage.getToken(this);
         if (oauth2Token == null) {
             if (checkIfSignedInToGoogle()) {
-            //    signOut();
+                signOut();
             } else {
                 signIn();
             }

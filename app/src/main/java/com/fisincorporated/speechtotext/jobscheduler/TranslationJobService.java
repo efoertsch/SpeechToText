@@ -23,9 +23,6 @@ import com.fisincorporated.speechtotext.utils.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
@@ -111,16 +108,16 @@ public class TranslationJobService extends JobService {
     }
 
     public boolean startSpeechToTextTranslation(JobParameters params) {
-        if (true) {
-            try {
-                speechToTextService.createDriveService();
-            } catch (GeneralSecurityException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return true;
-        }
+//        if (true) {
+//            try {
+//                speechToTextService.createDriveService();
+//            } catch (GeneralSecurityException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            return true;
+//        }
 
         SpeechToTextConversionData speechToTextConversionData = getConversionData(params);
 
@@ -137,6 +134,12 @@ public class TranslationJobService extends JobService {
                 public void onError(Throwable e) {
                     //TODO implement reattempt better than that below
                     jobFinished(params, false);
+//                    speechToTextConversionData.incrementTranslationAttempts();
+//                    //if (speechToTextConversionData.getTranslationAttempts() < 2) {
+//                        jobFinished(params, true);
+//                    } else {
+//                        jobFinished(params, false);
+//                    }
                     this.dispose();
                     postNotification(speechToTextConversionData);
                     Log.e(TAG, e.toString());
