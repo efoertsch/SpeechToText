@@ -2,8 +2,7 @@ apply plugin: 'com.android.application'
 
 //Adding Realm - plugin defined in project level build.gradle
 apply plugin: 'realm-android'
-// Retrolamdba of course
-//apply plugin: 'me.tatarka.retrolambda'
+
 
 android {
     compileSdkVersion 28
@@ -75,8 +74,10 @@ dependencies {
     final ESPRESSO_CORE_VERSION = '2.2.2'
     final JUNIT4_VERSION = '4.12'
     final RETROFIT_VERSION = '2.3.0'
-    final PLAY_SERVICES_VERSION = '16.0.0'
-    final FIREBASE_VERSION = '16.0.1'  //'10.0.1'
+    final PLAY_SERVICES_VERSION = '16.0.1'
+    final FIREBASE_CORE_VERSION = '16.0.8'
+    final FIREBASE_AUTH_VERSION = '16.2.1'
+    final FIREBASE_VERSION = '16.1.0'
     final GOOGLE_API_CLIENT = '1.22.0'
     final REALM_ANDROID_ADAPTER_VERSION = '1.4.0'
     final ADRIELCAFE_ANDROID_AUDIO_CONVERTER = "0.0.8"
@@ -133,15 +134,12 @@ dependencies {
             { exclude module: 'guava-jdk5' }
 
     // Needed Firebase auth to be able to sign in and get OAuth2 token
-    implementation "com.google.firebase:firebase-core:$FIREBASE_VERSION"
-    implementation "com.google.firebase:firebase-auth:$FIREBASE_VERSION"
+    implementation "com.google.firebase:firebase-core:$FIREBASE_CORE_VERSION"
+    implementation "com.google.firebase:firebase-auth:$FIREBASE_AUTH_VERSION"
     // Upload/download files to google/firebase cloud storage
     // (Although was able to upload files via gcs apii, for the life of me I couldn't delete the file via gcs api
     // So using firebase storage for upload/delete
     implementation "com.google.firebase:firebase-storage:$FIREBASE_VERSION"
-
-    // Mulitdex - built in for Android 5.0 and higher
-    //implementation 'com.android.support:multidex:1.0.1'
 
     androidTestImplementation("com.android.support.test.espresso:espresso-core:$ESPRESSO_CORE_VERSION", {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -164,8 +162,5 @@ buildscript {
     }
 }
 
-// Process the google-services.json
+// Process the google-services.json - must be at bottom
 apply plugin: 'com.google.gms.google-services'
-
-// make sure this line comes *after* you apply the Android plugin
-//apply plugin: 'com.getkeepsafe.dexcount'
