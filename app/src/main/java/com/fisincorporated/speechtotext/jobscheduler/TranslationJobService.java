@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -41,6 +42,10 @@ public class TranslationJobService extends JobService {
 
     @Inject
     public SpeechToTextService speechToTextService;
+
+    @Inject
+    @Named("CHANNEL_ID")
+    String CHANNEL_ID;
 
     @Inject
     public AudioRecordUtils audioRecordUtils;
@@ -175,7 +180,10 @@ public class TranslationJobService extends JobService {
         } else if (speechToTextConversionData.getException() != null) {
             contentText = getString(R.string.oops_an_error_has_occurred, speechToTextConversionData.getAudioDescripton(), speechToTextConversionData.getException().toString());
 
-        } else {
+        } else if (StringUtils.isNotEmpty(speechToTextConversionData.getLongRunningRecognizeError())){
+            contentText = speechToTextConversionData.getLongRunningRecognizeError();
+        }
+        else {
             contentText = getString(R.string.text_to_speech_conversion_proceeding, speechToTextConversionData.getAudioDescripton());
         }
         postNotification(speechToTextConversionData, contentText);
@@ -183,10 +191,11 @@ public class TranslationJobService extends JobService {
 
     public void postNotification(SpeechToTextConversionData speechToTextConversionData, String notificationContent) {
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
+                new NotificationCompat.Builder(this, CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_notification_info)
                         .setContentTitle(getString(R.string.app_name))
-                        .setContentText(notificationContent);
+                        .setContentText(notificationContent)
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationContent));
         // Creates an explicit intent for an Activity in your app
         Intent intent = new Intent(this, AudioPlaybackActivity.class);
         intent.putExtra(AudioPlaybackActivity.AUDIO_ID, speechToTextConversionData.getAudioRecordRealmId());

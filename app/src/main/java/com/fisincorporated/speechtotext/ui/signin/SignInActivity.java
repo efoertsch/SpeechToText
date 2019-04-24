@@ -37,7 +37,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
@@ -122,17 +122,17 @@ public class SignInActivity extends AppCompatActivity implements
         hideProgressDialog();
         checkForSpeechToTextData();
         String oauth2Token = TokenStorage.getToken(this);
-        if (oauth2Token == null) {
-            if (mAuth.getCurrentUser() == null) {
-                signOut();
-            } else {
-                signIn();
-            }
-
-        } else {
-            createJobSchedulerJob(speechToTextConversionData, oauth2Token);
-            finish();
-        }
+//        if (oauth2Token == null) {
+//            if (mAuth.getCurrentUser() == null) {
+//                signOut();
+//            } else {
+//                signIn();
+//            }
+//
+//        } else {
+//            createJobSchedulerJob(speechToTextConversionData, oauth2Token);
+//            finish();
+//        }
     }
 
 
@@ -315,9 +315,11 @@ public class SignInActivity extends AppCompatActivity implements
         @Override
         protected String doInBackground(Account... params) {
             try {
+                ArrayList<String> scopes = new ArrayList<>();
+                //scopes.add("https://www.googleapis.com/auth/drive.file");
+                scopes.add("https://www.googleapis.com/auth/cloud-platform");
                 GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
-                        SignInActivity.this,
-                        Collections.singleton("https://www.googleapis.com/auth/cloud-platform"));
+                        SignInActivity.this, scopes);
                 credential.setSelectedAccount(params[0]);
                 return credential.getToken();
             } catch (UserRecoverableAuthIOException userRecoverableException) {
