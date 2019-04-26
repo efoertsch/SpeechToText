@@ -95,7 +95,8 @@
 
     <!-- Menu text -->
     <string name="re_run_translation">(Re)Run Translation</string>
-
+    <string name="channel_name">SpeechToText</string>
+    <string name="channel_description">SpeechToText Update</string>
 
 
 </resources>

@@ -202,7 +202,7 @@ public class SpeechToTextService {
                             }
                         } else {
                             operation = response.body();
-                            if (operation.getError() != null && response.body().getError() != null) {
+                            if (operation != null && operation.getError() != null &&response.body().getError() != null) {
                                 speechToTextConversionData.setLongRunningRecognizeError(response.body().getError().toString());
                             } else {
                                 speechToTextConversionData.setLongRunningRecognizeError("Unspecified error");

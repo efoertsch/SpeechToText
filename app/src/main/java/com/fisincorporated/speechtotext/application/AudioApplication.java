@@ -1,13 +1,18 @@
 package com.fisincorporated.speechtotext.application;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
 import android.util.Log;
 
+import com.fisincorporated.speechtotext.R;
 import com.fisincorporated.speechtotext.audio.data.AudioRecord;
 import com.fisincorporated.speechtotext.audio.utils.AudioRecordUtils;
 import com.fisincorporated.speechtotext.dagger.application.ApplicationComponent;
 import com.fisincorporated.speechtotext.dagger.application.DaggerApplicationComponent;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
 import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
@@ -23,6 +28,10 @@ public class AudioApplication extends DaggerApplication {
     @Inject
     AudioRecordUtils audioRecordsUtils;
 
+    @Inject
+    @Named("CHANNEL_ID")
+    String channelId;
+
     @Override
     public void onCreate() {
         // Need to initialize Realm first, else get npe when firing up dagger injection
@@ -32,6 +41,7 @@ public class AudioApplication extends DaggerApplication {
         audioRecordsUtils.listAudioFiles();
         audioRecordsUtils.createMissingAudioRecords();
         loadAudioConverter();
+        createNotificationChannel();
     }
 
     private void connectRealm() {
@@ -59,7 +69,7 @@ public class AudioApplication extends DaggerApplication {
         AndroidAudioConverter.load(this, new ILoadCallback() {
             @Override
             public void onSuccess() {
-                Log.d(TAG, "AndroidAudioConverger loaded successfully");
+                Log.d(TAG, "AndroidAudioConverter loaded successfully");
             }
 
             @Override
@@ -67,6 +77,22 @@ public class AudioApplication extends DaggerApplication {
                 Log.d(TAG, "AndroidAudioConverter NOT LOADED!");
             }
         });
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getApplicationContext().getString(R.string.channel_name);
+            String description = getApplicationContext().getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel(channelId, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getApplicationContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
 

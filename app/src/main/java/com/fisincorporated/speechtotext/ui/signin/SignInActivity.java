@@ -19,15 +19,15 @@ import com.fisincorporated.speechtotext.application.TokenStorage;
 import com.fisincorporated.speechtotext.audio.utils.SpeechToTextConversionData;
 import com.fisincorporated.speechtotext.jobscheduler.JobSchedulerUtil;
 import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.OptionalPendingResult;
-import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.tasks.Task;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.firebase.auth.AuthCredential;
@@ -37,7 +37,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
@@ -60,8 +60,9 @@ public class SignInActivity extends AppCompatActivity implements
     private static final int RC_RECOVERABLE = 9002;
 
     private FirebaseAuth mAuth;
+    private GoogleSignInClient mGoogleSignInClient;
 
-    private GoogleApiClient mGoogleApiClient;
+
     private TextView mStatusTextView;
     private TextView mDetailTextView;
     private ProgressDialog mProgressDialog;
@@ -70,6 +71,7 @@ public class SignInActivity extends AppCompatActivity implements
 
     @Inject
     public JobSchedulerUtil jobSchedulerUtil;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,41 +88,18 @@ public class SignInActivity extends AppCompatActivity implements
         // Scope is to allow speech to text api to read uploaded gcs audio file
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
+                // Strings from src/debug/res/values/strings.xml
                 .requestIdToken(getString(R.string.web_client_id))
-                //.requestIdToken(getString(R.string.default_web_client_id))
-                .requestScopes(new Scope("https://www.googleapis.com/auth/cloud-platform")
-                        , new Scope("https://www.googleapis.com/auth/devstorage.read_write"))
-                //.requestServerAuthCode(this.getString(R.string.web_client_id))
+                // scopes not needed?
+//                .requestScopes(new Scope(getString(R.string.gcs_access_scope))
+//                        , new Scope(getString(R.string.gcs_read_write_scope)))
                 .build();
 
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-        // options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
+        // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         mAuth = FirebaseAuth.getInstance();
         // [END initialize_auth]
-    }
-
-    private void setupViews() {
-        setContentView(R.layout.activity_google_signin);
-
-        // Views
-        mStatusTextView = (TextView) findViewById(R.id.status);
-        mDetailTextView = (TextView) findViewById(R.id.detail);
-
-        // Button listeners
-        findViewById(R.id.sign_in_button).setOnClickListener(this);
-        findViewById(R.id.sign_out_button).setOnClickListener(this);
-        //findViewById(R.id.disconnect_button).setOnClickListener(this);
-
-        // [START customize_button]
-        // Set the dimensions of the sign-in button.
-        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
-
     }
 
     @Override
@@ -131,36 +110,31 @@ public class SignInActivity extends AppCompatActivity implements
         updateUI(currentUser);
     }
 
+
+    private void signIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         hideProgressDialog();
         checkForSpeechToTextData();
         String oauth2Token = TokenStorage.getToken(this);
-        if (oauth2Token == null) {
-            if (checkIfSignedInToGoogle()) {
-                signOut();
-            } else {
-                signIn();
-            }
-
-        } else {
-            createJobSchedulerJob(speechToTextConversionData, oauth2Token);
-            finish();
-        }
-    }
-
-    private boolean checkIfSignedInToGoogle() {
-        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
-        return opr.isDone();
-//       if (opr.isDones()) {
-//            // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
-//            // and the GoogleSignInResult will be available instantly.
-//            Log.d("TAG", "Got cached sign-in");
-//            GoogleSignInResult result = opr.get();
+//        if (oauth2Token == null) {
+//            if (mAuth.getCurrentUser() == null) {
+//                signOut();
+//            } else {
+//                signIn();
+//            }
 //
+//        } else {
+//            createJobSchedulerJob(speechToTextConversionData, oauth2Token);
+//            finish();
 //        }
     }
+
 
     private void checkForSpeechToTextData() {
         Bundle bundle = getIntent().getExtras();
@@ -187,23 +161,20 @@ public class SignInActivity extends AppCompatActivity implements
         }
     }
 
-    private void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
                 // Google Sign In was successful, authenticate with Firebase
-                firebaseAuthWithGoogle(result.getSignInAccount());
-            } else {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
+                Log.w(TAG, "Google sign in failed", e);
                 updateUI(null);
                 displaySignOnErrorDialog(getString(R.string.google_signin_unsuccessful));
             }
@@ -222,6 +193,7 @@ public class SignInActivity extends AppCompatActivity implements
                         Log.d(TAG, "signInWithCredential:success");
                         FirebaseUser user = mAuth.getCurrentUser();
                         updateUI(user);
+                        // get token for passing to jobscheduler for xlat of audio
                         new Oauth2TokenTask().execute(acct.getAccount());
                         //shouldStartSpeechToTextConverstion(user.getIdToken(true));
                     } else {
@@ -242,8 +214,36 @@ public class SignInActivity extends AppCompatActivity implements
         mAuth.signOut();
 
         // Google sign out
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                status -> updateUI(null));
+        mGoogleSignInClient.signOut().addOnCompleteListener(this,
+                task -> updateUI(null));
+    }
+
+    private void revokeAccess() {
+        // Firebase sign out
+        mAuth.signOut();
+
+        // Google revoke access
+        mGoogleSignInClient.revokeAccess().addOnCompleteListener(this,
+                task -> updateUI(null));
+    }
+
+
+    private void setupViews() {
+        setContentView(R.layout.activity_google_signin);
+
+        // Views
+        mStatusTextView = findViewById(R.id.status);
+        mDetailTextView = findViewById(R.id.detail);
+
+        // Button listeners
+        findViewById(R.id.sign_in_button).setOnClickListener(this);
+        findViewById(R.id.sign_out_button).setOnClickListener(this);
+        //findViewById(R.id.disconnect_button).setOnClickListener(this);
+
+        // [START customize_button]
+        // Set the dimensions of the sign-in button.
+        SignInButton signInButton = findViewById(R.id.sign_in_button);
+        signInButton.setSize(SignInButton.SIZE_STANDARD);
     }
 
     private void updateUI(FirebaseUser user) {
@@ -296,9 +296,9 @@ public class SignInActivity extends AppCompatActivity implements
             case R.id.sign_out_button:
                 signOut();
                 break;
-//            case R.id.disconnect_button:
-//                revokeAccess();
-//                break;
+            case R.id.disconnect_button:
+                revokeAccess();
+                break;
         }
     }
 
@@ -315,9 +315,11 @@ public class SignInActivity extends AppCompatActivity implements
         @Override
         protected String doInBackground(Account... params) {
             try {
+                ArrayList<String> scopes = new ArrayList<>();
+                //scopes.add("https://www.googleapis.com/auth/drive.file");
+                scopes.add("https://www.googleapis.com/auth/cloud-platform");
                 GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
-                        SignInActivity.this,
-                        Collections.singleton("https://www.googleapis.com/auth/cloud-platform"));
+                        SignInActivity.this, scopes);
                 credential.setSelectedAccount(params[0]);
                 return credential.getToken();
             } catch (UserRecoverableAuthIOException userRecoverableException) {
@@ -361,12 +363,10 @@ public class SignInActivity extends AppCompatActivity implements
                 .setTitle(R.string.signOnError);
 
         builder.setPositiveButton(R.string.retry, (dialog, id) -> {
-            signOnErrorDialog.dismiss();
             signOut();
             signIn();
         });
         builder.setNegativeButton(R.string.cancel, (dialog, id) -> {
-            signOnErrorDialog.dismiss();
             finish();
         });
 

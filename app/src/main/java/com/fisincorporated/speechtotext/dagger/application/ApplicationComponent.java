@@ -14,8 +14,9 @@ import dagger.android.AndroidInjector;
 
 
 @Singleton
-@Component(modules = {ActivityBuildersModule.class, AndroidInjectionModule.class, ApplicationModule.class, RetrofitModule.class})
-public interface ApplicationComponent  extends AndroidInjector<AudioApplication> {
+@Component(modules = {ActivityBuildersModule.class, AndroidInjectionModule.class, ApplicationModule.class, RetrofitModule.class
+        , ChannelIdModule.class})
+public interface ApplicationComponent extends AndroidInjector<AudioApplication> {
 
     @Component.Builder
     interface Builder {
