@@ -2,6 +2,7 @@ package com.fisincorporated.speechtotext.audio.utils;
 
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
@@ -64,9 +65,9 @@ public class SpeechToTextService {
 
     /**
      * Complete process
-     * 1. Convert 3gp to flac audio file
-     * 2. Upload flac file to gcs
-     * 3. Convert flac file to text
+     * 1. Convert 3gp to flac audio file - done on Android
+     * 2. Upload flac file to gcs -  Firebase handles upload to gcs bucket
+     * 3. Convert flac file to text - on Google
      * 4. Delete flac file on gcs and app device
      * 5. Update Realm object with text
      *
@@ -225,9 +226,9 @@ public class SpeechToTextService {
 
     Observable<SpeechToTextConversionData> startIntermittentCheckOnLongRunningObservable(SpeechToTextConversionData speechToTextConversionData) {
         Observable<SpeechToTextConversionData> observable = Observable.create(new ObservableOnSubscribe<SpeechToTextConversionData>() {
+            @SuppressLint("CheckResult")
             @Override
             public void subscribe(@io.reactivex.annotations.NonNull ObservableEmitter<SpeechToTextConversionData> emitter) throws Exception {
-
                 Observable.interval(5, TimeUnit.SECONDS, Schedulers.io())
                         .takeWhile(val -> (!speechToTextConversionData.isTranslationDone() && speechToTextConversionData.getLongRunningRecognizeError().isEmpty()))
                         .map(val -> {

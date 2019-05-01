@@ -79,6 +79,7 @@ dependencies {
     final FIREBASE_AUTH_VERSION = '16.2.1'
     final FIREBASE_VERSION = '16.1.0'
     final GOOGLE_API_CLIENT = '1.22.0'
+    final GOOGLE_DRIVE_REST_API_VERSION = '1.23.0'
     final REALM_ANDROID_ADAPTER_VERSION = '1.4.0'
     final ADRIELCAFE_ANDROID_AUDIO_CONVERTER = "0.0.8"
 
@@ -131,6 +132,14 @@ dependencies {
     implementation("com.google.api-client:google-api-client:$GOOGLE_API_CLIENT")
             { exclude module: 'guava-jdk5' }
     implementation("com.google.api-client:google-api-client-android:$GOOGLE_API_CLIENT")
+            { exclude module: 'guava-jdk5' }
+
+
+    // For Google Drive Rest APIs
+    //implementation 'com.google.api-client:google-api-client:1.23.0'
+    implementation ("com.google.oauth-client:google-oauth-client-jetty:$GOOGLE_DRIVE_REST_API_VERSION")
+            { exclude module: 'guava-jdk5' }
+    implementation ("com.google.apis:google-api-services-drive:v3-rev110-$GOOGLE_DRIVE_REST_API_VERSION")
             { exclude module: 'guava-jdk5' }
 
     // Needed Firebase auth to be able to sign in and get OAuth2 token

@@ -27,6 +27,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.Task;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
@@ -91,8 +92,10 @@ public class SignInActivity extends AppCompatActivity implements
                 // Strings from src/debug/res/values/strings.xml
                 .requestIdToken(getString(R.string.web_client_id))
                 // scopes not needed?
-//                .requestScopes(new Scope(getString(R.string.gcs_access_scope))
-//                        , new Scope(getString(R.string.gcs_read_write_scope)))
+                .requestScopes(new Scope(getString(R.string.gcs_access_scope))
+                        , new Scope(getString(R.string.gcs_read_write_scope)))
+                 //       , new Scope("https://www.googleapis.com/auth/drive.file"))
+
                 .build();
 
         // Build a GoogleSignInClient with the options specified by gso.
